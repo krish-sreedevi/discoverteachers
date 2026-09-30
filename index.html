@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Discover Teachers — preschool teacher recruitment</title>
+  <meta name="description" content="Discover Teachers connects preschools with verified early-years teachers nearby. Post jobs, filter by distance, experience and skills, and watch teaching videos.">
+  <meta name="theme-color" content="#23305B">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+  <meta property="og:title" content="Discover Teachers">
+  <meta property="og:description" content="Where preschools find their next great teacher.">
+  <meta property="og:image" content="https://www.aksreedevi.in/discoverteachers/assets/og-image.png">
+  <meta property="og:type" content="website">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="" defer></script>
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <a class="skip" href="#app">Skip to content</a>
+  <div id="demo-banner" class="demo-banner" hidden>
+    <strong>Demo mode</strong> — sample data, saved only in this browser. Try <code>sunshine@demo.in</code>, <code>priya@demo.in</code> or <code>admin@demo.in</code> with password <code>demo1234</code>.
+    <button type="button" class="linklike" data-reset>Reset demo data</button>
+  </div>
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="#/" class="brand" aria-label="Discover Teachers home"><img src="assets/logo.svg" alt="Discover Teachers" height="40"></a>
+      <button id="nav-toggle" class="nav-toggle" aria-label="Menu">☰</button>
+      <nav id="nav-links" class="nav-links" aria-label="Main"></nav>
+    </div>
+  </header>
+  <main id="app" tabindex="-1"><div class="loading"><span class="spin"></span></div></main>
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <img src="assets/logo-light.svg" alt="Discover Teachers" height="32">
+      <p>Helping preschools find caring, verified teachers close to home.</p>
+      <p class="small"><a href="#/jobs">Jobs</a> · <a href="#/register?as=school">For schools</a> · <a href="#/register?as=teacher">For teachers</a> · <a href="#/admin/login">Admin</a></p>
+      <p class="small muted-light">© 2026 Discover Teachers · Maps © OpenStreetMap contributors</p>
+    </div>
+  </footer>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
