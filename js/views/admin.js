@@ -1,8 +1,8 @@
-import { api } from '../api/index.js';
-import { fresh, loaderHTML, html, esc, $, $$, toast, setBusy, modal, rupees, salaryRange, payRange, yrs, ago, statusBadge, langList, yesNo, on } from '../lib/dom.js';
-import { formatAadhaar, isValidAadhaar } from '../lib/validate.js';
-import { gmapsUrl } from '../lib/geo.js';
-import { videoBlock } from './profile.js';
+import { api } from '../api/index.js?v=20261001-3';
+import { fresh, loaderHTML, html, esc, $, $$, toast, setBusy, modal, rupees, salaryRange, payRange, yrs, ago, statusBadge, langList, yesNo, on } from '../lib/dom.js?v=20261001-3';
+import { formatAadhaar, isValidAadhaar } from '../lib/validate.js?v=20261001-3';
+import { gmapsUrl } from '../lib/geo.js?v=20261001-3';
+import { videoBlock } from './profile.js?v=20261001-3';
 
 const st = { tab: 'school', filter: 'pending', q: '' };
 
