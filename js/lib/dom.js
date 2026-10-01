@@ -134,6 +134,8 @@ export function payRange(min, max, unit = 'month') {
 // New branded loader (from the "Discover Teachers Loader" artwork): the glass circles in a search
 // motion while the book pages turn and the reader bobs. One loop = 1.6s. Colours come from CSS.
 const LOADER_SVG = '<svg class="dtl-mark" viewBox="0 0 120 120" aria-hidden="true">'
+  + '<defs><linearGradient id="dtlR" gradientUnits="userSpaceOnUse" x1="10" y1="10" x2="111" y2="111"><stop offset="0" stop-color="#3647A1"/><stop offset="1" stop-color="#151C54"/></linearGradient>'
+  + '<linearGradient id="dtlA" gradientUnits="userSpaceOnUse" x1="28" y1="28" x2="76" y2="76"><stop offset="0" stop-color="#FDC449"/><stop offset="1" stop-color="#EF870E"/></linearGradient></defs>'
   + '<g class="dtl-orbit"><g transform="translate(0,-6)"><g class="dtl-up">'
   + '<g transform="translate(60,60) scale(.82) translate(-60.7,-60.7)">'
   + '<circle class="dtl-ring" cx="52" cy="52" r="37"/>'

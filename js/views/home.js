@@ -1,8 +1,8 @@
-import { api } from '../api/index.js?v=20261001-8';
-import { html, esc } from '../lib/dom.js?v=20261001-8';
-import { ACTIVITIES } from '../lib/constants.js?v=20261001-8';
-import { jobCard } from './jobs.js?v=20261001-8';
-import { state, homeFor } from '../app.js?v=20261001-8';
+import { api } from '../api/index.js?v=20261001-9';
+import { html, esc } from '../lib/dom.js?v=20261001-9';
+import { ACTIVITIES } from '../lib/constants.js?v=20261001-9';
+import { jobCard } from './jobs.js?v=20261001-9';
+import { state, homeFor } from '../app.js?v=20261001-9';
 
 const ACTS = [['🧘', 'Yoga'], ['💃', 'Dance'], ['🎨', 'Art & craft'], ['🏺', 'Pottery'], ['🎵', 'Music & singing'], ['🥋', 'Karate / martial arts'], ['♟️', 'Chess'], ['🎩', 'Magic show']];
 
@@ -31,7 +31,7 @@ export async function home(el) {
         ${dash ? html`<a class="btn btn-primary btn-lg" href="${dash}">Go to your dashboard →</a>` : ''}
       </div>
       <div class="hero-art" aria-hidden="true">
-        <img src="assets/mark.svg" alt="" class="hero-mark">
+        <img src="assets/brand/mark.svg" alt="" class="hero-mark">
         <div class="float f1">🧘 Yoga</div><div class="float f2">🎨 Art</div><div class="float f3">💃 Dance</div><div class="float f4">📍 2.1 km away</div><div class="float f5">🔤 English</div><div class="float f6">🔢 Math</div>
       </div>
     </div>

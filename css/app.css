@@ -256,14 +256,15 @@ html.intro-on, html.intro-on body { overflow: hidden; }
 .intro { position: fixed; inset: 0; z-index: 3000; background: #FFFFFF; display: grid; place-items: center; cursor: pointer; transition: opacity .55s ease, visibility .55s; }
 .intro.out { opacity: 0; visibility: hidden; }
 .intro svg { width: min(82vw, 720px); height: auto; overflow: visible; }
-.intro .ring { fill: none; stroke: #1F2A6B; stroke-width: 10; stroke-dasharray: 233; stroke-dashoffset: 233; animation: dt-draw .8s cubic-bezier(.6,0,.3,1) .2s forwards; }
-.intro .handle { stroke: #1F2A6B; stroke-width: 15; stroke-linecap: round; stroke-dasharray: 34; stroke-dashoffset: 34; animation: dt-draw .35s ease-out .9s forwards; }
-.intro .head { fill: #F4A623; transform-box: fill-box; transform-origin: center; transform: scale(0); animation: dt-pop .45s cubic-bezier(.3,1.6,.5,1) 1.15s forwards; }
-.intro .pg { fill: #F4A623; transform-box: fill-box; transform: scaleX(0); animation: dt-unfold .5s cubic-bezier(.2,.9,.3,1.2) 1.3s forwards; }
+.intro .ring { fill: none; stroke: url(#dtiR); stroke-width: 10; stroke-dasharray: 233; stroke-dashoffset: 233; animation: dt-draw .8s cubic-bezier(.6,0,.3,1) .2s forwards; }
+.intro .handle { stroke: url(#dtiR); stroke-width: 15; stroke-linecap: round; stroke-dasharray: 34; stroke-dashoffset: 34; animation: dt-draw .35s ease-out .9s forwards; }
+.intro .head { fill: url(#dtiA); transform-box: fill-box; transform-origin: center; transform: scale(0); animation: dt-pop .45s cubic-bezier(.3,1.6,.5,1) 1.15s forwards; }
+.intro .pg { fill: url(#dtiA); transform-box: fill-box; transform: scaleX(0); animation: dt-unfold .5s cubic-bezier(.2,.9,.3,1.2) 1.3s forwards; }
 .intro .pl { transform-origin: right center; } .intro .pr { transform-origin: left center; }
 .intro .mark { transform: translateX(205px) scale(1.35); transform-box: view-box; transform-origin: 76px 68px; animation: dt-settle .8s cubic-bezier(.7,0,.2,1) 1.9s forwards; }
 .intro .lens { transform-box: fill-box; transform-origin: center; animation: dt-nudge .5s ease-in-out 3.6s; }
-.intro .ltr { opacity: 0; transform-box: fill-box; animation: dt-rise .45s cubic-bezier(.2,.8,.2,1) calc(2.35s + var(--i) * 55ms) forwards; }
+.intro .wm { opacity: 0; clip-path: inset(0 100% 0 0); animation: dt-reveal .8s cubic-bezier(.2,.8,.2,1) 2.3s forwards; }
+@keyframes dt-reveal { to { opacity: 1; clip-path: inset(0 0 0 0); } }
 .intro .ink { fill: #1F2A6B; } .intro .amb { fill: #F4A623; }
 @keyframes dt-draw { to { stroke-dashoffset: 0; } }
 @keyframes dt-pop { to { transform: scale(1); } }
@@ -301,7 +302,7 @@ html.intro-on, html.intro-on body { overflow: hidden; }
 /* ---------- branded loader (Discover Teachers Loader artwork) ---------- */
 .dt-loader { min-height: 52vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 48px 16px; text-align: center; }
 .dt-loader-compact { min-height: 0; padding: 32px 16px; }
-.dtl-mark { width: 96px; height: 96px; overflow: visible; --dtl-ink: #1F2A6B; --dtl-acc: #F4A623; }
+.dtl-mark { width: 96px; height: 96px; overflow: visible; --dtl-ink: url(#dtlR); --dtl-acc: url(#dtlA); }
 .dt-loader-compact .dtl-mark { width: 56px; height: 56px; }
 .dtl-msg { margin: 0; font: 600 .95rem var(--font-head); color: var(--navy); }
 .dtl-msg::after { content: ''; display: inline-block; width: 1.2em; text-align: left; animation: dtl-dots 1.6s steps(4) infinite; }
@@ -376,3 +377,10 @@ html.intro-on, html.intro-on body { overflow: hidden; }
 .jcard:hover .jcard-more, .jcard:focus-visible .jcard-more { opacity: 1; transform: translateX(2px); color: var(--coral-d); }
 .jcard-foot .beyond-badge { white-space: nowrap; }
 .jcard { transition: transform .15s, border-color .15s, box-shadow .15s; } .jcard:hover { box-shadow: 0 2px 4px rgba(31,42,107,.05), 0 12px 28px rgba(31,42,107,.12); }
+
+/* ---------- new brand chrome (gradient navy from the brand artwork) ---------- */
+.site-footer { background: linear-gradient(160deg, #28368C, #161D55); }
+.stat-strip { background: linear-gradient(120deg, #28368C, #161D55); }
+.brand img { height: 40px; width: auto; }
+@media (max-width: 760px) { .brand img { height: 32px; } }
+.site-footer .footer-inner img { height: 32px; width: auto; }
