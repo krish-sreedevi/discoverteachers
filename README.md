@@ -4,6 +4,14 @@ A recruitment platform for preschools: schools register and get verified, post j
 
 Live at **https://www.aksreedevi.in/discoverteachers/**
 
+## Features
+
+- **Schools:** register with proof of establishment and map location, get verified, post jobs (autofilled from the school profile), and filter candidates by distance, experience, pay, languages, skills and teaching video.
+- **Job types:** full-time or part-time class teacher, regular **extracurricular** classes (paid per session), and **one-time events/workshops** (with an event date and total fee).
+- **Browse teachers:** everyone can browse class teachers, extracurricular instructors (yoga, dance, art, pottery, music, karate, chess…) and event performers. Visitors see a privacy-safe preview (first name + initial, location rounded to ~1 km, no contact details); verified schools see full profiles, contact details and videos.
+- **Teachers:** one profile covering what work they want (class / extracurricular / events), activities, fees, experience, languages, Aadhaar (checked, never shown to schools) and an optional teaching video.
+- **Admin:** verifies schools and teachers.
+
 ## How it's built
 
 - Static site (plain HTML/CSS/JS modules, no build step) hosted on GitHub Pages.
@@ -25,12 +33,15 @@ Live at **https://www.aksreedevi.in/discoverteachers/**
    ```
    Log in at `#/admin/login` to approve schools and teachers.
 
+Updating an existing Supabase project after pulling new code? Just run `supabase/schema.sql` again — it's safe to re-run and adds any new columns.
+
 ## Who can see what (enforced by Row Level Security)
 
 | Data | Visible to |
 |---|---|
 | Aadhaar number | The teacher and admins only |
 | Teacher profile, contact, video | The teacher, admins, and **verified** schools |
+| Teacher preview in Browse teachers (first name + initial, skills, activities, fees, ~1 km location) | Everyone |
 | School proof of establishment | The school and admins only |
 | Open job listings of verified schools | Everyone |
 | Applications | The teacher, the school that owns the job, admins |

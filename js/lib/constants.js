@@ -26,3 +26,30 @@ export const QUALIFICATIONS = [
 ];
 
 export const APP_STATUSES = ['applied', 'invited', 'shortlisted', 'interview', 'hired', 'rejected'];
+
+// ---------- extracurricular & events ----------
+export const ACTIVITIES = [
+  'Yoga', 'Dance', 'Bharatanatyam', 'Western dance', 'Zumba & aerobics', 'Art & craft', 'Pottery', 'Clay modelling',
+  'Music & singing', 'Keyboard / guitar', 'Drama & theatre', 'Storytelling', 'Puppetry', 'Karate / martial arts',
+  'Chess', 'Abacus', 'Robotics / STEM', 'Phonics', 'Gardening & nature', 'Cooking (no-fire)', 'Sports & PE',
+  'Swimming', 'Skating', 'Magic show', 'Face painting', 'Balloon art',
+];
+
+// What kind of work a teacher wants
+export const WORK_TYPES = [
+  ['class', 'Class teacher (full-time / part-time)', '🏫'],
+  ['extracurricular', 'Extracurricular classes (weekly / regular)', '🎨'],
+  ['event', 'One-time events & workshops', '🎉'],
+];
+export const WORK_LABEL = { class: 'Class teacher', extracurricular: 'Extracurricular', event: 'One-time events' };
+
+// What kind of role a school posts
+export const JOB_TYPES = [
+  ['full_time', 'Class teacher — full-time', 'month'],
+  ['part_time', 'Class teacher — part-time', 'month'],
+  ['extracurricular', 'Extracurricular classes (regular)', 'session'],
+  ['event', 'One-time event / workshop', 'event'],
+];
+export const JOB_TYPE_LABEL = { full_time: 'Full-time', part_time: 'Part-time', extracurricular: 'Extracurricular', event: 'One-time event' };
+export const PAY_UNIT_LABEL = { month: '/month', session: '/session', event: ' total', hour: '/hour' };
+export const jobWorkType = (t) => (t === 'extracurricular' ? 'extracurricular' : t === 'event' ? 'event' : 'class');

@@ -1,7 +1,8 @@
 import { api } from '../api/index.js';
-import { fresh, html, esc, $, toast, salaryRange, ago, statusBadge, on } from '../lib/dom.js';
+import { fresh, html, esc, $, toast, salaryRange, payRange, ago, statusBadge, on } from '../lib/dom.js';
 import { distanceKm } from '../lib/geo.js';
 import { jobCard } from './jobs.js';
+import { jobWorkType } from '../lib/constants.js';
 import { state } from '../app.js';
 
 export async function dashboard(el) {
@@ -11,7 +12,7 @@ export async function dashboard(el) {
   const invites = apps.filter((a) => a.status === 'invited' && a.job);
   const active = apps.filter((a) => a.status !== 'invited' && a.job);
   const appBy = Object.fromEntries(apps.map((a) => [a.job_id, a]));
-  const near = jobs.map((j) => ({ ...j, _dist: distanceKm(t, j) })).filter((j) => !appBy[j.id])
+  const near = jobs.map((j) => ({ ...j, _dist: distanceKm(t, j) })).filter((j) => !appBy[j.id] && (t.work_types && t.work_types.length ? t.work_types : ['class']).includes(jobWorkType(j.job_type)))
     .sort((a, b) => (a._dist ?? 1e9) - (b._dist ?? 1e9)).slice(0, 4);
 
   const checks = [
@@ -36,7 +37,7 @@ export async function dashboard(el) {
     <div class="grid-2-1">
       <div>
         ${invites.length ? html`<div class="card highlight"><h2>💌 Schools want you to apply</h2><ul class="activity">${invites.map((a) => html`<li>
-          <span class="grow"><a href="#/jobs/${a.job_id}"><strong>${a.job.title}</strong></a><br><span class="muted small">${a.job.school?.name} · ${salaryRange(a.job.salary_min, a.job.salary_max)}/mo · ${ago(a.created_at)}</span></span>
+          <span class="grow"><a href="#/jobs/${a.job_id}"><strong>${a.job.title}</strong></a><br><span class="muted small">${a.job.school?.name} · ${payRange(a.job.salary_min, a.job.salary_max, a.job.pay_unit)} · ${ago(a.created_at)}</span></span>
           <button class="btn btn-primary btn-sm" data-accept="${a.job_id}">Apply</button><button class="btn btn-ghost btn-sm" data-decline="${a.id}">No thanks</button></li>`)}</ul></div>` : ''}
         <div class="card"><h2>My applications</h2>
           ${active.length ? html`<ul class="activity">${active.map((a) => html`<li><span class="grow"><a href="#/jobs/${a.job_id}">${a.job.title}</a><br><span class="muted small">${a.job.school?.name} · updated ${ago(a.updated_at)}</span></span>${statusBadge(a.status)}</li>`)}</ul>`

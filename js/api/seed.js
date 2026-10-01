@@ -41,6 +41,10 @@ export async function seedData(hash) {
     ['t-anjali', 'Anjali Verma', 'anjali@demo.in', 12.9698, 77.7500, 'Whitefield, Bengaluru', 4, 26000, ['Yoga', 'Sports & PE', 'Gardening & nature'], [L('English', 'Fluent'), L('Hindi', 'Native')], 'B.Ed', 'approved', ''],
     ['t-lakshmi', 'Lakshmi Gowda', 'lakshmi@demo.in', 12.9279, 77.5619, 'Banashankari, Bengaluru', 2, 18000, ['Rhymes & action songs', 'Clay modelling', 'Cooking activities'], [L('Kannada', 'Native'), L('English', 'Conversational')], 'Pre-primary Teacher Training (PPTT)', 'approved', ''],
     ['t-nisha', 'Nisha Menon', 'nisha@demo.in', 12.9900, 77.6600, 'Old Airport Road, Bengaluru', 6, 32000, ['Abacus / early maths', 'Phonics', 'Computer basics'], [L('English', 'Fluent'), L('Malayalam', 'Native'), L('Tamil', 'Conversational')], 'B.A. / B.Sc. / B.Com', 'approved', ''],
+    ['t-arjun', 'Arjun Rao', 'arjun@demo.in', 12.9450, 77.6050, 'Koramangala 6th Block, Bengaluru', 6, null, ['Yoga', 'Sports & PE'], [L('English', 'Fluent'), L('Kannada', 'Native'), L('Hindi', 'Conversational')], 'Other', 'approved', ''],
+    ['t-fatima', 'Fatima Begum', 'fatima@demo.in', 12.9800, 77.6200, 'Ulsoor, Bengaluru', 9, null, ['Art & craft', 'Clay modelling'], [L('English', 'Fluent'), L('Urdu', 'Native'), L('Hindi', 'Fluent')], 'Other', 'approved', ''],
+    ['t-shruthi', 'Shruthi Iyer', 'shruthi@demo.in', 12.9300, 77.5800, 'Jayanagar, Bengaluru', 12, null, ['Dance', 'Music & singing'], [L('English', 'Fluent'), L('Tamil', 'Native'), L('Kannada', 'Fluent')], 'Other', 'approved', 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'],
+    ['t-vikram', 'Vikram "Magic" Menon', 'vikram@demo.in', 12.9600, 77.6400, 'Domlur, Bengaluru', 8, null, ['Storytelling', 'Drama & puppetry'], [L('English', 'Native'), L('Malayalam', 'Fluent'), L('Hindi', 'Conversational')], 'Other', 'approved', ''],
     ['t-meera', 'Meera Pillai', 'meera@demo.in', 12.9010, 77.6300, 'Bommanahalli, Bengaluru', 0, 15000, ['Art & craft', 'Dance'], [L('English', 'Conversational'), L('Malayalam', 'Native')], 'NTT (Nursery Teacher Training)', 'pending', ''],
   ];
   const teachers = [], teacher_private = [];
@@ -55,6 +59,26 @@ export async function seedData(hash) {
     teacher_private.push({ teacher_id: id, aadhaar: a });
     teachers[i].aadhaar_last4 = a.slice(-4);
   });
+
+  // Extracurricular / event details
+  const X = {
+    't-priya': { work_types: ['class', 'extracurricular'], activities: ['Yoga', 'Storytelling', 'Phonics'], session_fee: 600 },
+    't-kavya': { work_types: ['class', 'event'], activities: ['Western dance', 'Dance'], event_fee: 5000 },
+    't-sana': { work_types: ['class', 'extracurricular', 'event'], activities: ['Art & craft', 'Clay modelling', 'Face painting'], session_fee: 700, event_fee: 4000 },
+    't-anjali': { work_types: ['class', 'extracurricular'], activities: ['Yoga', 'Zumba & aerobics', 'Gardening & nature'], session_fee: 500 },
+    't-arjun': { work_types: ['extracurricular', 'event'], activities: ['Yoga', 'Karate / martial arts', 'Sports & PE'], session_fee: 800, event_fee: 6000, travel_km: 12,
+      about: 'Certified kids-yoga and karate instructor. I run 30–40 minute playful sessions for 3–6 year olds and sports-day warm-ups.' },
+    't-fatima': { work_types: ['extracurricular', 'event'], activities: ['Pottery', 'Clay modelling', 'Art & craft'], session_fee: 900, event_fee: 7000, travel_km: 15,
+      about: 'Studio potter. I bring a portable wheel and air-dry clay for hands-on pottery workshops and weekly art classes.' },
+    't-shruthi': { work_types: ['extracurricular', 'event'], activities: ['Bharatanatyam', 'Dance', 'Music & singing'], session_fee: 1000, event_fee: 15000, travel_km: 10,
+      about: 'Bharatanatyam dancer with 12 years of teaching. I choreograph annual-day and festival performances for little ones.' },
+    't-vikram': { work_types: ['event'], activities: ['Magic show', 'Storytelling', 'Puppetry', 'Balloon art'], event_fee: 8000, travel_km: 25,
+      about: 'Magic, puppets and stories — 45-minute shows for preschool celebrations, Children\'s Day and summer camps.' },
+  };
+  teachers.forEach((t) => {
+    Object.assign(t, { work_types: ['class'], activities: [], session_fee: null, event_fee: null, travel_km: null }, X[t.id] || {});
+    if (!t.work_types.includes('class')) { t.expected_salary = null; t.qualification = null; }
+  });
   users.forEach((u) => { u.pw = pw; u.created_at = daysAgo(30); });
 
   const jobs = [
@@ -64,9 +88,9 @@ export async function seedData(hash) {
       salary_min: 25000, salary_max: 35000, timings: '8:30 AM – 3:30 PM', working_days: 'Monday – Friday', start_date: null, age_group: '3 – 6 years',
       bus_provided: true, food_provided: true, languages: [L('English', 'Fluent'), L('Kannada', 'Conversational')], skills_preferred: ['Montessori methods', 'Storytelling'],
       curriculum: 'Montessori', address: schools[0].address, lat: schools[0].lat, lng: schools[0].lng, status: 'open', created_at: daysAgo(3), updated_at: daysAgo(3) },
-    { id: 'j-2', school_id: 's-sunshine', title: 'Yoga & Movement Teacher (part-time)', openings: 1,
+    { id: 'j-2', school_id: 's-sunshine', title: 'Weekly kids yoga sessions', openings: 1, job_type: 'extracurricular', pay_unit: 'session', activity: 'Yoga', duration: '3 × 40-min sessions per week',
       description: 'Three 40-minute yoga and movement sessions each morning for toddlers and pre-K.', requirements: 'Yoga certification and experience with under-6s.', min_experience: 1,
-      salary_min: 12000, salary_max: 18000, timings: '9:00 AM – 12:00 PM', working_days: 'Mon, Wed, Fri', start_date: null, age_group: '2 – 6 years',
+      salary_min: 600, salary_max: 900, timings: '9:00 AM – 12:00 PM', working_days: 'Mon, Wed, Fri', start_date: null, age_group: '2 – 6 years',
       bus_provided: false, food_provided: true, languages: [L('English', 'Conversational')], skills_preferred: ['Yoga', 'Sports & PE'],
       curriculum: 'Montessori', address: schools[0].address, lat: schools[0].lat, lng: schools[0].lng, status: 'open', created_at: daysAgo(6), updated_at: daysAgo(6) },
     { id: 'j-3', school_id: 's-banyan', title: 'Nursery Class Teacher', openings: 1,
@@ -74,7 +98,14 @@ export async function seedData(hash) {
       salary_min: 20000, salary_max: 26000, timings: '9:00 AM – 2:00 PM', working_days: 'Monday – Saturday (2nd & 4th Sat off)', start_date: null, age_group: '3 – 4 years',
       bus_provided: false, food_provided: true, languages: [L('English', 'Fluent'), L('Kannada', 'Conversational')], skills_preferred: ['Rhymes & action songs', 'Art & craft'],
       curriculum: 'Play-way method', address: schools[1].address, lat: schools[1].lat, lng: schools[1].lng, status: 'open', created_at: daysAgo(2), updated_at: daysAgo(2) },
+    { id: 'j-4', school_id: 's-banyan', title: 'Annual Day dance choreography', openings: 1, job_type: 'event', pay_unit: 'event', activity: 'Dance',
+      description: 'Choreograph two short dances (Nursery and UKG, about 15 children each) for our Annual Day. Six practice sessions in the 3 weeks before the event, plus the event morning.',
+      requirements: 'Experience choreographing for under-6s. Please share a video of a past performance.', min_experience: 2,
+      salary_min: 12000, salary_max: 18000, timings: 'Practice 11:30 AM – 12:30 PM', working_days: '6 practice sessions + event day', start_date: null, event_date: '2026-12-12', duration: '3 weeks of practice + event day',
+      age_group: '3 – 5 years', bus_provided: false, food_provided: true, languages: [L('English', 'Conversational')], skills_preferred: [],
+      curriculum: 'Play-way method', address: schools[1].address, lat: schools[1].lat, lng: schools[1].lng, status: 'open', created_at: daysAgo(1), updated_at: daysAgo(1) },
   ];
+  jobs.forEach((j) => { j.job_type ||= 'full_time'; j.pay_unit ||= 'month'; j.activity ||= null; j.event_date ||= null; j.duration ||= null; });
   const applications = [
     { id: 'a-1', job_id: 'j-1', teacher_id: 't-nisha', initiated_by: 'teacher', status: 'applied', message: 'I live 3 km away and would love to join.', created_at: daysAgo(2), updated_at: daysAgo(2) },
     { id: 'a-2', job_id: 'j-3', teacher_id: 't-priya', initiated_by: 'school', status: 'invited', message: '', created_at: daysAgo(1), updated_at: daysAgo(1) },

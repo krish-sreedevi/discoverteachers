@@ -33,12 +33,19 @@ export async function home(el) {
       <div class="how-col"><h2>🍎 For teachers</h2><ol class="steps">
         <li><strong>Build one profile.</strong> Your experience, skills, languages and expected salary.</li>
         <li><strong>Add a teaching video.</strong> Optional, but it's the best way to stand out.</li>
-        <li><strong>Get invited.</strong> Verified schools near your home find you, or you apply to jobs yourself.</li></ol></div>
+        <li><strong>Get invited.</strong> Verified schools near your home find you, or you apply to jobs yourself.</li>
+          <li><strong>Teach a hobby?</strong> Yoga, dance, art or pottery instructors can offer weekly classes or one-time events too.</li></ol></div>
     </div>
     <div class="features">
       <div class="feature"><span>✅</span><h3>Everyone is verified</h3><p>Schools submit proof of establishment; teachers are checked against Aadhaar. Aadhaar is never shown to schools.</p></div>
       <div class="feature"><span>📍</span><h3>Distance-first search</h3><p>Every school and teacher is pinned on the map, so you see who can reach you easily.</p></div>
       <div class="feature"><span>🎬</span><h3>See them teach</h3><p>Short classroom videos tell you more than any CV.</p></div>
+    </div>
+    <div class="extra-band">
+      <div><p class="eyebrow">Beyond the classroom</p><h2>Yoga, dance, art, pottery & more</h2>
+        <p>Find instructors for weekly extracurricular classes — or book someone for a one-time event: annual day choreography, a pottery workshop, a magic show for Children's Day.</p>
+        <div class="row"><a class="btn btn-primary" href="#/teachers?type=extracurricular">Browse extracurricular teachers</a><a class="btn btn-ghost" href="#/teachers?type=event">One-time events</a></div></div>
+      <div class="act-tiles">${[['🧘', 'Yoga'], ['💃', 'Dance'], ['🎨', 'Art & craft'], ['🏺', 'Pottery'], ['🎵', 'Music & singing'], ['🥋', 'Karate / martial arts'], ['♟️', 'Chess'], ['🎩', 'Magic show']].map(([i, a]) => html`<a class="act-tile" href="#/teachers?type=${a === 'Magic show' ? 'event' : 'extracurricular'}&activity=${encodeURIComponent(a)}"><span>${i}</span>${a}</a>`)}</div>
     </div>
     ${jobs.length ? html`<div class="section-head"><h2>Latest openings</h2><a href="#/jobs">See all jobs →</a></div><div class="cards">${jobs.map((j) => jobCard(j))}</div>` : ''}
   </section>`);

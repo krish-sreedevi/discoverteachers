@@ -37,6 +37,7 @@ const routes = [
   ['/school/jobs/:id', () => import('./views/school.js'), 'jobManage', 'school'],
   ['/teacher', () => import('./views/teacher.js'), 'dashboard', 'teacher'],
   ['/teacher/profile', () => import('./views/profile.js'), 'teacherForm', 'teacher', true],
+  ['/teachers', () => import('./views/directory.js'), 'browseTeachers'],
   ['/teachers/:id', () => import('./views/profile.js'), 'teacherView', ['school', 'admin', 'teacher']],
   ['/schools/:id', () => import('./views/profile.js'), 'schoolView'],
   ['/admin', () => import('./views/admin.js'), 'dashboard', 'admin'],
@@ -92,10 +93,12 @@ export function renderNav() {
   const path = (location.hash.replace(/^#/, '') || '/').split('?')[0];
   const link = (href, label) => html`<a href="#${href}" class="${path === href || (href !== '/' && path.startsWith(href + '/')) ? 'active' : ''}">${label}</a>`;
   let links;
-  if (!u) links = html`${link('/jobs', 'Browse jobs')}<a href="#/login" class="btn btn-ghost btn-sm">Log in</a><a href="#/register" class="btn btn-primary btn-sm">Join free</a>`;
-  else if (u.role === 'school') links = html`${link('/school', 'Dashboard')}${link('/school/jobs/new', 'Post a job')}${link('/school/profile', 'School profile')}<button class="btn btn-ghost btn-sm" data-logout>Log out</button>`;
-  else if (u.role === 'teacher') links = html`${link('/teacher', 'Dashboard')}${link('/jobs', 'Find jobs')}${link('/teacher/profile', 'My profile')}<button class="btn btn-ghost btn-sm" data-logout>Log out</button>`;
-  else links = html`${link('/admin', 'Admin')}${link('/jobs', 'Jobs')}<button class="btn btn-ghost btn-sm" data-logout>Log out</button>`;
+  const browse = html`${link('/jobs', 'Browse jobs')}${link('/teachers', 'Browse teachers')}`;
+  const out = html`<button class="btn btn-ghost btn-sm" data-logout>Log out</button>`;
+  if (!u) links = html`${browse}<a href="#/login" class="btn btn-ghost btn-sm">Log in</a><a href="#/register" class="btn btn-primary btn-sm">Join free</a>`;
+  else if (u.role === 'school') links = html`${link('/school', 'Dashboard')}${browse}${link('/school/jobs/new', 'Post a job')}${link('/school/profile', 'Profile')}${out}`;
+  else if (u.role === 'teacher') links = html`${link('/teacher', 'Dashboard')}${browse}${link('/teacher/profile', 'My profile')}${out}`;
+  else links = html`${link('/admin', 'Admin')}${browse}${out}`;
   $('#nav-links').innerHTML = esc(links);
 }
 

@@ -1,17 +1,20 @@
 import { api } from '../api/index.js';
-import { fresh, html, esc, $, $$, toast, setBusy, salaryRange, km, ago, statusBadge, langList, yesNo, modal } from '../lib/dom.js';
+import { fresh, html, esc, $, $$, toast, setBusy, salaryRange, payRange, km, ago, statusBadge, langList, yesNo, modal } from '../lib/dom.js';
 import { distanceKm, baseMap, pinIcon, gmapsDirections, gmapsUrl } from '../lib/geo.js';
 import { options } from './widgets.js';
+import { JOB_TYPE_LABEL, jobWorkType } from '../lib/constants.js';
+
+const fmtDate = (d) => new Date(d + 'T00:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
 import { state } from '../app.js';
 
 export function jobCard(j, { dist, app } = {}) {
   return html`<a class="jcard" href="#/jobs/${j.id}">
-    <div class="jcard-top"><span class="avatar avatar-school">🏫</span>
+    <div class="jcard-top"><span class="avatar avatar-school">${{ extracurricular: '🎨', event: '🎉' }[j.job_type] || '🏫'}</span>
       <div class="grow"><h3>${j.title}</h3><p class="muted small">${j.school?.name || ''}</p></div>
       ${dist != null ? html`<span class="dist">📍 ${km(dist)}</span>` : ''}</div>
-    <div class="tfacts"><span class="good">💰 ${salaryRange(j.salary_min, j.salary_max)}/mo</span><span>🕘 ${j.timings || '—'}</span>
+    <div class="tfacts"><span class="good">💰 ${payRange(j.salary_min, j.salary_max, j.pay_unit)}</span>${j.job_type === 'event' && j.event_date ? html`<span>📅 ${fmtDate(j.event_date)}</span>` : html`<span>🕘 ${j.timings || '—'}</span>`}
       <span>${j.openings} opening${j.openings > 1 ? 's' : ''}</span></div>
-    <div class="chips">${j.curriculum ? html`<span class="chip">${j.curriculum}</span>` : ''}${j.bus_provided ? html`<span class="chip chip-skill">🚌 Bus</span>` : ''}${j.food_provided ? html`<span class="chip chip-skill">🍱 Food</span>` : ''}
+    <div class="chips">${j.job_type && j.job_type !== 'full_time' ? html`<span class="chip chip-type-${j.job_type}">${JOB_TYPE_LABEL[j.job_type]}</span>` : ''}${j.activity ? html`<span class="chip chip-match">${j.activity}</span>` : ''}${j.curriculum && jobWorkType(j.job_type) === 'class' ? html`<span class="chip">${j.curriculum}</span>` : ''}${j.bus_provided ? html`<span class="chip chip-skill">🚌 Bus</span>` : ''}${j.food_provided ? html`<span class="chip chip-skill">🍱 Food</span>` : ''}
       ${(j.languages || []).slice(0, 3).map((l) => html`<span class="chip">${l.language}</span>`)}</div>
     <div class="jcard-foot"><span class="muted small">${j.address?.split(',').slice(-3, -1).join(',').trim() || ''} · ${ago(j.created_at)}</span>${app ? statusBadge(app.status) : ''}</div>
   </a>`;
@@ -26,11 +29,12 @@ export async function browse(el, _p, q) {
   el.innerHTML = esc(html`<section class="page wide">
     <div class="page-head"><div><p class="eyebrow">Preschool jobs</p><h1>${me ? 'Jobs near you' : 'Open teaching jobs'}</h1></div>
       ${!state.user ? html`<a class="btn btn-primary" href="#/register?as=teacher">Create teacher profile</a>` : ''}</div>
+    <div class="mode-tabs" role="group" aria-label="Type of job">${[['all', 'All jobs'], ['class', '🏫 Class teacher'], ['extracurricular', '🎨 Extracurricular'], ['event', '🎉 One-time events']].map(([k, l]) => html`<button class="mode-tab" data-mode="${k}" aria-pressed="${(q.type || 'all') === k}">${l}</button>`)}</div>
     <div class="finder">
       <aside class="filters card" aria-label="Filters"><h2>Filters</h2>
         <label>Search<input type="search" name="q" value="${q.q || ''}" placeholder="Title, school, area…"></label>
         ${me ? html`<label>Distance from home: <strong data-distlabel></strong><input type="range" name="dist" min="1" max="51" value="${q.dist || 51}"></label>` : ''}
-        <label>Minimum salary (₹/month)<input type="number" name="minSal" step="1000" min="0" placeholder="Any"></label>
+        <label data-minlabel>Minimum pay (₹)<input type="number" name="minSal" step="100" min="0" placeholder="Any"></label>
         <label>Curriculum<select name="curr">${options(curricula, '', { placeholder: 'Any' })}</select></label>
         <label class="check"><input type="checkbox" name="bus"> Bus / pick-up provided</label>
         <label class="check"><input type="checkbox" name="food"> Food provided</label>
@@ -39,12 +43,18 @@ export async function browse(el, _p, q) {
       <div class="results"><div class="results-head"><p data-count></p></div><div class="cards" data-list></div></div>
     </div></section>`);
   const panel = $('.filters', el);
+  let mode = ['class', 'extracurricular', 'event'].includes(q.type) ? q.type : 'all';
+  el.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-mode]'); if (!b) return;
+    mode = b.dataset.mode; el.querySelectorAll('[data-mode]').forEach((x) => x.setAttribute('aria-pressed', x === b)); render();
+  });
   const render = () => {
+    $('[data-minlabel]', el).firstChild.textContent = { all: 'Minimum pay (₹)', class: 'Minimum salary (₹/month)', extracurricular: 'Minimum fee per session (₹)', event: 'Minimum event fee (₹)' }[mode];
     const v = (n) => panel.querySelector(`[name=${n}]`);
     const text = v('q').value.trim().toLowerCase(), dist = v('dist') ? Number(v('dist').value) : 51;
     if (v('dist')) $('[data-distlabel]', el).textContent = dist > 50 ? 'Any' : `${dist} km`;
     const minSal = Number(v('minSal').value || 0), curr = v('curr').value, bus = v('bus').checked, food = v('food').checked, sort = v('sort').value;
-    const list = all.filter((j) => (!text || `${j.title} ${j.school?.name} ${j.address} ${j.description}`.toLowerCase().includes(text))
+    const list = all.filter((j) => (mode === 'all' || jobWorkType(j.job_type) === mode) && (!text || `${j.title} ${j.school?.name} ${j.address} ${j.description} ${j.activity || ''}`.toLowerCase().includes(text))
       && (dist > 50 || (j._dist != null && j._dist <= dist)) && (!minSal || (j.salary_max || 0) >= minSal)
       && (!curr || j.curriculum === curr) && (!bus || j.bus_provided) && (!food || j.food_provided))
       .sort((a, b) => (sort === 'near' ? (a._dist ?? 1e9) - (b._dist ?? 1e9) : sort === 'pay' ? (b.salary_max || 0) - (a.salary_max || 0) : b.created_at.localeCompare(a.created_at)));
@@ -80,7 +90,7 @@ export async function detail(el, { id }) {
     <div class="card profile-head"><div class="avatar avatar-lg avatar-school">🏫</div>
       <div class="grow"><p class="eyebrow">${j.status === 'closed' ? statusBadge('closed') : ''} Posted ${ago(j.created_at)}</p><h1>${j.title}</h1>
         <p><a href="#/schools/${s.id}">${s.name}</a>${s.status === 'approved' ? html` ${statusBadge('approved')}` : ''}</p>
-        <p class="facts"><span>💰 <strong>${salaryRange(j.salary_min, j.salary_max)}</strong>/month</span><span>🕘 ${j.timings || '—'}${j.working_days ? ` · ${j.working_days}` : ''}</span>
+        <p class="facts"><span>💰 <strong>${payRange(j.salary_min, j.salary_max, j.pay_unit)}</strong></span>${j.timings || j.working_days ? html`<span>🕘 ${j.timings || ''}${j.timings && j.working_days ? ' · ' : ''}${j.working_days || ''}</span>` : ''}
         ${dist != null ? html`<span>📍 <strong>${km(dist)}</strong> from your home</span>` : ''}</p></div></div>
     <div class="grid-2-1"><div>
       <div class="card"><h2>About the role</h2><p class="pre">${j.description || ''}</p>
@@ -90,6 +100,10 @@ export async function detail(el, { id }) {
     </div><div>
       <div class="card sticky">${cta}
         <dl class="kv mt">
+          <dt>Type</dt><dd>${JOB_TYPE_LABEL[j.job_type] || 'Full-time'}</dd>
+          ${j.activity ? html`<dt>Activity</dt><dd>${j.activity}</dd>` : ''}
+          ${j.event_date ? html`<dt>Event date</dt><dd>${fmtDate(j.event_date)}</dd>` : ''}
+          ${j.duration ? html`<dt>Duration</dt><dd>${j.duration}</dd>` : ''}
           <dt>Openings</dt><dd>${j.openings}</dd>
           <dt>Experience</dt><dd>${Number(j.min_experience) ? `${j.min_experience}+ yrs` : 'Freshers welcome'}</dd>
           ${j.age_group ? html`<dt>Age group</dt><dd>${j.age_group}</dd>` : ''}

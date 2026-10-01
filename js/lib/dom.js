@@ -49,7 +49,7 @@ export function modal(content, { wide = false, onClose } = {}) {
     <button class="modal-x" aria-label="Close">×</button><div class="modal-body">${esc(content)}</div></div>`;
   const close = () => { wrap.remove(); document.removeEventListener('keydown', key); onClose && onClose(); };
   const key = (e) => { if (e.key === 'Escape') close(); };
-  wrap.addEventListener('click', (e) => { if (e.target === wrap || e.target.closest('.modal-x')) close(); });
+  wrap.addEventListener('click', (e) => { if (e.target === wrap || e.target.closest('.modal-x') || e.target.closest('a[href^="#"]')) close(); });
   document.addEventListener('keydown', key);
   document.body.appendChild(wrap);
   return { el: wrap.querySelector('.modal-body'), close };
@@ -122,4 +122,10 @@ export function setBusy(btn, busy, label) {
   if (!btn) return;
   if (busy) { btn.dataset.label = btn.innerHTML; btn.disabled = true; btn.innerHTML = `<span class="spin"></span>${label || 'Please wait…'}`; }
   else { btn.disabled = false; if (btn.dataset.label) btn.innerHTML = btn.dataset.label; }
+}
+
+const PAY_UNIT = { month: '/month', session: '/session', event: ' total', hour: '/hour' };
+export function payRange(min, max, unit = 'month') {
+  const r = salaryRange(min, max);
+  return r === 'Not specified' ? r : r + (PAY_UNIT[unit] || '');
 }

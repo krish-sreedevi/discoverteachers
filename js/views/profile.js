@@ -1,6 +1,6 @@
 import { api } from '../api/index.js';
-import { html, esc, $, toast, setBusy, formData, num, rupees, yrs, km, initials, statusBadge, langList, yesNo, modal } from '../lib/dom.js';
-import { CURRICULA, AGES, QUALIFICATIONS } from '../lib/constants.js';
+import { html, esc, $, $$, toast, setBusy, formData, num, rupees, yrs, km, initials, statusBadge, langList, yesNo, modal } from '../lib/dom.js';
+import { CURRICULA, AGES, QUALIFICATIONS, ACTIVITIES, WORK_TYPES, WORK_LABEL } from '../lib/constants.js';
 import { isValidAadhaar, cleanAadhaar, formatAadhaar, isValidPhone, cleanPhone, isEmail, normalizeUrl } from '../lib/validate.js';
 import { locationField, mountLocationField, readLocation, distanceKm, gmapsUrl, gmapsDirections } from '../lib/geo.js';
 import { languagesField, experienceField, skillsField, yesNoField, mountRepeaters, readRepeater, options } from './widgets.js';
@@ -122,6 +122,7 @@ export async function schoolForm(el) {
 export async function teacherForm(el) {
   const t = state.profile || {};
   const priv = state.profile ? await api.getTeacherPrivate().catch(() => null) : null;
+  const wt = t.work_types || ['class'];
   el.innerHTML = esc(html`<section class="page narrow">
     <h1>${state.profile ? 'My teacher profile' : 'Create your teacher profile'}</h1>
     ${statusNote(state.profile, 'teacher')}
@@ -139,10 +140,22 @@ export async function teacherForm(el) {
         </div>
         <label>A few lines about you<textarea name="about" rows="3" placeholder="Your teaching style, what you enjoy doing with children…">${t.about || ''}</textarea></label>
       </div>
+      <div class="card"><h2>What work are you looking for? <span class="req">*</span></h2>
+        <p class="hint">Pick all that apply — schools can find you for each.</p>
+        <div class="work-picks">${WORK_TYPES.map(([v, l, ico]) => html`<label class="work-pick"><input type="checkbox" name="work_types" value="${v}" ${wt.includes(v) ? 'checked' : ''}><span><b>${ico}</b>${l}</span></label>`)}</div>
+      </div>
+      <div class="card" data-show-for="extracurricular event"><h2>🎨 Extracurricular & events</h2>
+        ${skillsField(t.activities || [], { name: 'activities', label: 'What can you teach or perform?', list: ACTIVITIES, otherName: null })}
+        <div class="grid3">
+          <label data-show-for="extracurricular">Fee per session (₹)<input name="session_fee" type="number" min="0" step="50" value="${t.session_fee ?? ''}" placeholder="e.g. 700"></label>
+          <label data-show-for="event">Fee per event, from (₹)<input name="event_fee" type="number" min="0" step="500" value="${t.event_fee ?? ''}" placeholder="e.g. 5000"></label>
+          <label>How far will you travel? (km)<input name="travel_km" type="number" min="1" max="100" value="${t.travel_km ?? ''}" placeholder="e.g. 10"></label>
+        </div>
+      </div>
       <div class="card"><h2>Experience & skills</h2>
         <div class="grid2">
           <label>Total teaching experience (years) <span class="req">*</span><input name="experience_years" type="number" min="0" max="50" step="0.5" required value="${t.experience_years ?? ''}" placeholder="0 if fresher"></label>
-          <label>Expected salary (₹ / month) <span class="req">*</span><input name="expected_salary" type="number" min="0" step="500" required value="${t.expected_salary ?? ''}" placeholder="e.g. 25000"></label>
+          <label data-show-for="class">Expected salary as class teacher (₹ / month) <span class="req">*</span><input name="expected_salary" type="number" min="0" step="500" value="${t.expected_salary ?? ''}" placeholder="e.g. 25000"></label>
         </div>
         ${experienceField(t.experience || [])}
         ${skillsField(t.skills || [], { other: t.skills_other || '' })}
@@ -162,6 +175,12 @@ export async function teacherForm(el) {
     </form></section>`);
   const form = $('#tf');
   mountRepeaters(form); mountLocationField(form);
+  const syncWork = () => {
+    const on = $$('[name=work_types]:checked', form).map((c) => c.value);
+    $$('[data-show-for]', form).forEach((n) => { n.hidden = !n.dataset.showFor.split(' ').some((k) => on.includes(k)); });
+  };
+  form.addEventListener('change', (e) => { if (e.target.name === 'work_types') syncWork(); });
+  syncWork();
   form.aadhaar.addEventListener('input', (e) => { const c = e.target.selectionStart === e.target.value.length; e.target.value = formatAadhaar(e.target.value).slice(0, 14); if (c) e.target.selectionStart = e.target.value.length; });
   form.video.addEventListener('change', (e) => {
     const f = e.target.files[0], pv = form.querySelector('[data-preview]');
@@ -187,7 +206,11 @@ export async function teacherForm(el) {
     if (d.whatsapp && !isValidPhone(d.whatsapp)) return err('Please enter a valid WhatsApp number', 'whatsapp');
     if (d.email && !isEmail(d.email)) return err('Please enter a valid email', 'email');
     if (d.experience_years === '' || Number(d.experience_years) < 0) return err('Please enter your years of experience (0 if fresher)', 'experience_years');
-    if (!d.expected_salary) return err('Please enter your expected monthly salary', 'expected_salary');
+    const work_types = $$('[name=work_types]:checked', form).map((c) => c.value);
+    const activities = $$('[name=activities]:checked', form).map((c) => c.value);
+    if (!work_types.length) return err('Please choose what kind of work you\'re looking for');
+    if (work_types.includes('class') && !d.expected_salary) return err('Please enter your expected monthly salary', 'expected_salary');
+    if ((work_types.includes('extracurricular') || work_types.includes('event')) && !activities.length) return err('Please pick at least one activity you can teach or perform');
     const languages = readRepeater(form, 'languages');
     if (!languages.length) return err('Please add at least one language');
     if (!loc) return err('Please drop a pin for where you live');
@@ -199,7 +222,9 @@ export async function teacherForm(el) {
       await api.saveTeacher({
         full_name: d.full_name, phone: cleanPhone(d.phone), whatsapp: d.whatsapp ? cleanPhone(d.whatsapp) : null, email: d.email || null,
         qualification: d.qualification || null, about: d.about || null, experience_years: Number(d.experience_years),
-        expected_salary: num(d.expected_salary), experience: readRepeater(form, 'experience'), skills: d.skills || [], skills_other: d.skills_other || null,
+        work_types, activities, session_fee: work_types.includes('extracurricular') ? num(d.session_fee) : null,
+        event_fee: work_types.includes('event') ? num(d.event_fee) : null, travel_km: num(d.travel_km),
+        expected_salary: work_types.includes('class') ? num(d.expected_salary) : null, experience: readRepeater(form, 'experience'), skills: d.skills || [], skills_other: d.skills_other || null,
         languages, address: d.address, lat: loc.lat, lng: loc.lng, maps_link: d.maps_link || null,
         video_path, video_link: normalizeUrl(d.video_link) || null, aadhaar_last4: aad.slice(-4),
       }, changedAadhaar ? aad : null);
@@ -250,7 +275,8 @@ export async function teacherView(el, { id }, q) {
       <div class="grow"><h1>${t.full_name} ${statusBadge(t.status)}</h1>
         <p class="muted">${t.qualification || 'Preschool teacher'} · ${yrs(t.experience_years)} experience</p>
         <p class="facts"><span>📍 ${t.address?.split(',').slice(-3).join(',').trim() || '—'}${dist != null ? html` · <strong>${km(dist)}</strong> from ${origin === state.profile ? 'your school' : 'the job'}` : ''}</span>
-          <span>💰 Expects <strong>${rupees(t.expected_salary)}</strong>/month</span></p>
+          ${t.expected_salary ? html`<span>💰 Expects <strong>${rupees(t.expected_salary)}</strong>/month</span>` : ''}</p>
+        <div class="chips mt">${(t.work_types || ['class']).map((w) => html`<span class="chip chip-work">${WORK_LABEL[w] || w}</span>`)}</div>
       </div>
     </div>
     <div class="grid-2-1">
@@ -262,6 +288,9 @@ export async function teacherView(el, { id }, q) {
         </div>
       </div>
       <div>
+        ${(t.activities || []).length ? html`<div class="card"><h2>🎨 Extracurricular & events</h2>
+          <div class="chips">${t.activities.map((a) => html`<span class="chip chip-skill">${a}</span>`)}</div>
+          <dl class="kv mt">${t.session_fee ? html`<dt>Per session</dt><dd>${rupees(t.session_fee)}</dd>` : ''}${t.event_fee ? html`<dt>Events from</dt><dd>${rupees(t.event_fee)}</dd>` : ''}${t.travel_km ? html`<dt>Travels up to</dt><dd>${t.travel_km} km</dd>` : ''}</dl></div>` : ''}
         <div class="card"><h2>Skills</h2><div class="chips">${(t.skills || []).map((s) => html`<span class="chip chip-skill">${s}</span>`)}${t.skills_other ? html`<span class="chip">${t.skills_other}</span>` : ''}${!(t.skills || []).length && !t.skills_other ? html`<span class="muted">—</span>` : ''}</div></div>
         <div class="card"><h2>Languages</h2><div class="chips">${langList(t.languages)}</div></div>
         <div class="card"><h2>Contact</h2>

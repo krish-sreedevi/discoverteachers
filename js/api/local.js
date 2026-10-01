@@ -1,7 +1,7 @@
 // Demo backend: same API as supabase.js, stored in this browser (localStorage + IndexedDB for files).
 import { seedData } from './seed.js';
 
-const KEY = 'dt_demo_db_v1', SKEY = 'dt_demo_session';
+const KEY = 'dt_demo_db_v2', SKEY = 'dt_demo_session';
 const clone = (x) => JSON.parse(JSON.stringify(x));
 const uuid = () => (crypto.randomUUID ? crypto.randomUUID() : 'id-' + Math.random().toString(36).slice(2) + Date.now().toString(36));
 const now = () => new Date().toISOString();
@@ -123,6 +123,19 @@ export async function createLocalApi() {
     async deleteJob(id) { const j = db.jobs.find((x) => x.id === id); if (!j || j.school_id !== uid()) throw new Error('Not your listing'); db.jobs = db.jobs.filter((x) => x.id !== id); db.applications = db.applications.filter((a) => a.job_id !== id); save(); },
 
     async listTeachers() { if (!approvedSchool() && !isAdmin()) return []; return clone(db.teachers.filter((t) => t.status === 'approved')); },
+
+    async listTeacherDirectory(full) {
+      const approved = db.teachers.filter((t) => t.status === 'approved');
+      if (full && (approvedSchool() || isAdmin())) return clone(approved);
+      return approved.map((t) => {
+        const parts = t.full_name.trim().split(/\s+/);
+        return { id: t.id, full_name: parts[0] + (parts.length > 1 ? ` ${parts[parts.length - 1][0]}.` : ''), qualification: t.qualification,
+          experience_years: t.experience_years, skills: t.skills, skills_other: t.skills_other, languages: t.languages, expected_salary: t.expected_salary,
+          work_types: t.work_types, activities: t.activities, session_fee: t.session_fee, event_fee: t.event_fee, travel_km: t.travel_km,
+          about: (t.about || '').slice(0, 280), has_video: !!(t.video_path || t.video_link),
+          lat: t.lat == null ? null : Math.round(t.lat * 100) / 100, lng: t.lng == null ? null : Math.round(t.lng * 100) / 100, updated_at: t.updated_at, limited: true };
+      });
+    },
 
     async applyToJob(job_id, message = '') {
       await delay();

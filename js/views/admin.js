@@ -1,5 +1,5 @@
 import { api } from '../api/index.js';
-import { fresh, html, esc, $, $$, toast, setBusy, modal, rupees, salaryRange, yrs, ago, statusBadge, langList, yesNo, on } from '../lib/dom.js';
+import { fresh, html, esc, $, $$, toast, setBusy, modal, rupees, salaryRange, payRange, yrs, ago, statusBadge, langList, yesNo, on } from '../lib/dom.js';
 import { formatAadhaar, isValidAadhaar } from '../lib/validate.js';
 import { gmapsUrl } from '../lib/geo.js';
 import { videoBlock } from './profile.js';
@@ -47,7 +47,7 @@ export async function dashboard(el) {
     if (!list.length) { box.innerHTML = esc(html`<div class="empty"><div class="big-ico">✅</div><p>Nothing here.</p></div>`); return; }
     if (st.tab === 'jobs') {
       box.innerHTML = esc(html`<div class="table-wrap"><table><thead><tr><th>Job</th><th>School</th><th>Salary</th><th>Openings</th><th>Status</th><th>Posted</th></tr></thead><tbody>
-        ${list.map((j) => html`<tr><td><a href="#/jobs/${j.id}">${j.title}</a></td><td>${j.school?.name}</td><td>${salaryRange(j.salary_min, j.salary_max)}</td><td>${j.openings}</td><td>${statusBadge(j.status)}</td><td>${ago(j.created_at)}</td></tr>`)}
+        ${list.map((j) => html`<tr><td><a href="#/jobs/${j.id}">${j.title}</a></td><td>${j.school?.name}</td><td>${payRange(j.salary_min, j.salary_max, j.pay_unit)}</td><td>${j.openings}</td><td>${statusBadge(j.status)}</td><td>${ago(j.created_at)}</td></tr>`)}
       </tbody></table></div>`);
       return;
     }

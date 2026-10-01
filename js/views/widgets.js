@@ -68,11 +68,11 @@ export function readRepeater(root, kind) {
 }
 
 // ---------- skills ----------
-export function skillsField(selected = [], { name = 'skills', label = 'Special skills', other = '' , otherName = 'skills_other' } = {}) {
+export function skillsField(selected = [], { name = 'skills', label = 'Special skills', other = '', otherName = 'skills_other', list = SKILLS, otherLabel = 'Other skills', otherPlaceholder = 'e.g. Bharatanatyam, Carnatic vocals, sign language' } = {}) {
   const set = new Set(selected);
   return html`<fieldset class="chips-field"><legend>${label}</legend>
-    <div class="chip-picks">${SKILLS.map((s) => html`<label class="chip-pick"><input type="checkbox" name="${name}" value="${s}" ${set.has(s) ? 'checked' : ''}><span>${s}</span></label>`)}</div>
-    ${otherName ? html`<label class="mt">Other skills <input name="${otherName}" value="${other}" placeholder="e.g. Bharatanatyam, Carnatic vocals, sign language"></label>` : ''}
+    <div class="chip-picks">${[...new Set([...list, ...selected])].map((s) => html`<label class="chip-pick"><input type="checkbox" name="${name}" value="${s}" ${set.has(s) ? 'checked' : ''}><span>${s}</span></label>`)}</div>
+    ${otherName ? html`<label class="mt">${otherLabel} <input name="${otherName}" value="${other}" placeholder="${otherPlaceholder}"></label>` : ''}
   </fieldset>`;
 }
 

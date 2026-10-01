@@ -311,6 +311,51 @@ drop policy if exists apps_update on public.applications;
 create policy apps_update on public.applications for update
   using (teacher_id = auth.uid() or public.owns_job(job_id) or public.is_admin());
 
+
+-- ---------------------------------------------------------------------
+-- Extracurricular teachers & one-time events (added Oct 2026)
+-- ---------------------------------------------------------------------
+alter table public.teachers add column if not exists work_types text[] not null default '{class}';
+alter table public.teachers add column if not exists activities text[] not null default '{}';
+alter table public.teachers add column if not exists session_fee int;   -- ₹ per extracurricular session
+alter table public.teachers add column if not exists event_fee int;     -- ₹ starting fee for a one-time event
+alter table public.teachers add column if not exists travel_km int;     -- how far they'll travel
+alter table public.teachers alter column expected_salary drop not null;
+
+alter table public.job_listings add column if not exists job_type text not null default 'full_time';
+alter table public.job_listings add column if not exists pay_unit text not null default 'month';
+alter table public.job_listings add column if not exists activity text;
+alter table public.job_listings add column if not exists event_date date;
+alter table public.job_listings add column if not exists duration text;
+alter table public.job_listings drop constraint if exists job_listings_job_type_check;
+alter table public.job_listings add constraint job_listings_job_type_check check (job_type in ('full_time','part_time','extracurricular','event'));
+alter table public.job_listings drop constraint if exists job_listings_pay_unit_check;
+alter table public.job_listings add constraint job_listings_pay_unit_check check (pay_unit in ('month','session','event','hour'));
+
+-- Public "Browse teachers" directory: verified teachers only, no contact
+-- details, surname shortened to an initial, location rounded to ~1 km.
+drop function if exists public.public_teacher_directory();
+create function public.public_teacher_directory()
+returns table (
+  id uuid, display_name text, qualification text, experience_years numeric, skills text[], skills_other text,
+  languages jsonb, expected_salary int, work_types text[], activities text[], session_fee int, event_fee int,
+  travel_km int, about text, has_video boolean, lat double precision, lng double precision, updated_at timestamptz
+) language sql stable security definer set search_path = public as $$
+  select t.id,
+         split_part(trim(t.full_name), ' ', 1) ||
+           case when position(' ' in trim(t.full_name)) > 0
+                then ' ' || left(split_part(trim(t.full_name), ' ', array_length(string_to_array(trim(t.full_name), ' '), 1)), 1) || '.'
+                else '' end,
+         t.qualification, t.experience_years, t.skills, t.skills_other, t.languages, t.expected_salary,
+         t.work_types, t.activities, t.session_fee, t.event_fee, t.travel_km, left(t.about, 280),
+         (t.video_path is not null or coalesce(t.video_link, '') <> ''),
+         round(t.lat::numeric, 2)::double precision, round(t.lng::numeric, 2)::double precision, t.updated_at
+  from public.teachers t
+  where t.status = 'approved'
+  order by t.updated_at desc
+$$;
+grant execute on function public.public_teacher_directory() to anon, authenticated;
+
 -- ---------------------------------------------------------------------
 -- Storage buckets (private; files are served with short-lived signed URLs)
 -- ---------------------------------------------------------------------

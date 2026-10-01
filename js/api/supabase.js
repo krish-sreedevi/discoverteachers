@@ -77,6 +77,11 @@ export async function createSupabaseApi(url, key) {
     // ---- teachers (school view) ----
     async listTeachers() { return chk(await sb.from('teachers').select('*').eq('status', 'approved').order('updated_at', { ascending: false })); },
 
+    async listTeacherDirectory(full) {
+      if (full) return chk(await sb.from('teachers').select('*').eq('status', 'approved').order('updated_at', { ascending: false }));
+      return (chk(await sb.rpc('public_teacher_directory')) || []).map((r) => ({ ...r, full_name: r.display_name, limited: true }));
+    },
+
     // ---- applications ----
     async applyToJob(job_id, message = '') {
       const existing = chk(await sb.from('applications').select('*').eq('job_id', job_id).eq('teacher_id', uid()).maybeSingle());
