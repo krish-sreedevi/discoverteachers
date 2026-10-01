@@ -25,11 +25,13 @@ export async function browse(el, _p, q) {
   const [jobs, apps] = await withLoader(Promise.all([api.listOpenJobs(), me ? api.myApplications().catch(() => []) : []]), 1600);
   const appBy = Object.fromEntries(apps.map((a) => [a.job_id, a]));
   const all = jobs.map((j) => ({ ...j, _dist: me ? distanceKm(me, j) : null }));
+  // Teachers start on the kind of work they're looking for; everyone else on class-teacher jobs
+  const startMode = ['class', 'extracurricular', 'event'].includes(q.type) ? q.type : (me?.work_types?.[0] || 'class');
   const curricula = [...new Set(all.map((j) => j.curriculum).filter(Boolean))];
   el.innerHTML = esc(html`<section class="page wide">
     <div class="page-head"><div><p class="eyebrow">Preschool jobs</p><h1>${me ? 'Jobs near you' : 'Open teaching jobs'}</h1></div>
       ${!state.user ? html`<a class="btn btn-primary" href="#/register?as=teacher">Create teacher profile</a>` : ''}</div>
-    <div class="mode-tabs" role="group" aria-label="Type of job">${[['all', 'All jobs'], ['class', '🏫 Class teacher'], ['extracurricular', '🎨 Extracurricular'], ['event', '🎉 One-time events']].map(([k, l]) => html`<button class="mode-tab" data-mode="${k}" aria-pressed="${(q.type || 'all') === k}">${l}</button>`)}</div>
+    <div class="mode-tabs" role="group" aria-label="Type of job">${[['class', '🏫 Class teacher'], ['extracurricular', '🎨 Extracurricular'], ['event', '🎉 One-time events']].map(([k, l]) => html`<button class="mode-tab" data-mode="${k}" aria-pressed="${startMode === k}">${l}</button>`)}</div>
     <div class="finder">
       <aside class="filters card" aria-label="Filters"><h2>Filters</h2>
         <label>Search<input type="search" name="q" value="${q.q || ''}" placeholder="Title, school, area…"></label>
@@ -43,10 +45,11 @@ export async function browse(el, _p, q) {
       <div class="results"><div class="results-head"><p data-count></p></div><div class="cards" data-list></div></div>
     </div></section>`);
   const panel = $('.filters', el);
-  let mode = ['class', 'extracurricular', 'event'].includes(q.type) ? q.type : 'all';
+  let mode = startMode;
   el.addEventListener('click', (e) => {
     const b = e.target.closest('[data-mode]'); if (!b) return;
     mode = b.dataset.mode; el.querySelectorAll('[data-mode]').forEach((x) => x.setAttribute('aria-pressed', x === b));
+    history.replaceState(null, '', `#/jobs?type=${mode}`);
     $('[data-count]', el).innerHTML = ''; $('[data-list]', el).innerHTML = loaderHTML('Finding jobs', { compact: true });
     clearTimeout(el._t); el._t = setTimeout(render, 700);
   });
