@@ -367,3 +367,8 @@ html.intro-on, html.intro-on body { overflow: hidden; }
 .cards > .dt-loader { grid-column: 1 / -1; }
 .radius-field { margin-top: 18px; } .radius-picks { display: flex; flex-wrap: wrap; gap: 8px; }
 .within-badge { font-size: .78rem; font-weight: 800; padding: 3px 9px; border-radius: 999px; background: var(--leaf-l); color: #2E7A2A; } .beyond-badge { font-size: .78rem; font-weight: 800; padding: 3px 9px; border-radius: 999px; background: #FDF0E6; color: #B4561C; }
+.jcard:focus-visible { outline: 3px solid var(--sun); outline-offset: 2px; }
+.jcard-more { font-weight: 800; font-size: .85rem; color: var(--navy); opacity: .55; transition: opacity .15s, transform .15s; white-space: nowrap; }
+.jcard:hover .jcard-more, .jcard:focus-visible .jcard-more { opacity: 1; transform: translateX(2px); color: var(--coral-d); }
+.jcard-foot .beyond-badge { white-space: nowrap; }
+.jcard { transition: transform .15s, border-color .15s, box-shadow .15s; } .jcard:hover { box-shadow: 0 2px 4px rgba(31,42,107,.05), 0 12px 28px rgba(31,42,107,.12); }

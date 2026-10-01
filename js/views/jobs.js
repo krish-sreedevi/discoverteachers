@@ -1,11 +1,11 @@
-import { api } from '../api/index.js?v=20261001-3';
-import { fresh, withLoader, showLoader, loaderHTML, html, esc, $, $$, toast, setBusy, salaryRange, payRange, km, ago, statusBadge, langList, yesNo, modal } from '../lib/dom.js?v=20261001-3';
-import { distanceKm, baseMap, pinIcon, gmapsDirections, gmapsUrl } from '../lib/geo.js?v=20261001-3';
-import { options } from './widgets.js?v=20261001-3';
-import { JOB_TYPE_LABEL, jobWorkType } from '../lib/constants.js?v=20261001-3';
+import { api } from '../api/index.js?v=20261001-4';
+import { fresh, withLoader, showLoader, loaderHTML, html, esc, $, $$, toast, setBusy, salaryRange, payRange, km, ago, statusBadge, langList, yesNo, modal } from '../lib/dom.js?v=20261001-4';
+import { distanceKm, baseMap, pinIcon, gmapsDirections, gmapsUrl } from '../lib/geo.js?v=20261001-4';
+import { options } from './widgets.js?v=20261001-4';
+import { JOB_TYPE_LABEL, jobWorkType } from '../lib/constants.js?v=20261001-4';
 
 const fmtDate = (d) => new Date(d + 'T00:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
-import { state } from '../app.js?v=20261001-3';
+import { state } from '../app.js?v=20261001-4';
 
 export function jobCard(j, { dist, app } = {}) {
   return html`<a class="jcard" href="#/jobs/${j.id}">
@@ -16,7 +16,7 @@ export function jobCard(j, { dist, app } = {}) {
       <span>${j.openings} opening${j.openings > 1 ? 's' : ''}</span></div>
     <div class="chips">${j.job_type && j.job_type !== 'full_time' ? html`<span class="chip chip-type-${j.job_type}">${JOB_TYPE_LABEL[j.job_type]}</span>` : ''}${j.activity ? html`<span class="chip chip-match">${j.activity}</span>` : ''}${j.curriculum && jobWorkType(j.job_type) === 'class' ? html`<span class="chip">${j.curriculum}</span>` : ''}${j.bus_provided ? html`<span class="chip chip-skill">🚌 Bus</span>` : ''}${j.food_provided ? html`<span class="chip chip-skill">🍱 Food</span>` : ''}
       ${(j.languages || []).slice(0, 3).map((l) => html`<span class="chip">${l.language}</span>`)}</div>
-    <div class="jcard-foot"><span class="muted small">${j.address?.split(',').slice(-3, -1).join(',').trim() || ''} · ${ago(j.created_at)}</span>${app ? statusBadge(app.status) : ''}</div>
+    <div class="jcard-foot"><span class="muted small">${j.address?.split(',').slice(-3, -1).join(',').trim() || ''} · ${ago(j.created_at)}</span>${app ? statusBadge(app.status) : html`<span class="jcard-more">View job →</span>`}</div>
   </a>`;
 }
 

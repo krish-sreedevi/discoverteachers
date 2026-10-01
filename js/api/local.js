@@ -1,5 +1,5 @@
 // Demo backend: same API as supabase.js, stored in this browser (localStorage + IndexedDB for files).
-import { seedData } from './seed.js?v=20261001-3';
+import { seedData } from './seed.js?v=20261001-4';
 
 const KEY = 'dt_demo_db_v3', SKEY = 'dt_demo_session';
 const clone = (x) => JSON.parse(JSON.stringify(x));

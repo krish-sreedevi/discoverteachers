@@ -1,10 +1,10 @@
 // Browse teachers: class teachers, extracurricular instructors and one-time event performers.
-import { api } from '../api/index.js?v=20261001-3';
-import { fresh, withLoader, loaderHTML, html, esc, $, $$, toast, rupees, yrs, km, initials, modal, on } from '../lib/dom.js?v=20261001-3';
-import { ACTIVITIES, SKILLS, LANGUAGES, WORK_LABEL } from '../lib/constants.js?v=20261001-3';
-import { distanceKm, geocode } from '../lib/geo.js?v=20261001-3';
-import { options } from './widgets.js?v=20261001-3';
-import { state } from '../app.js?v=20261001-3';
+import { api } from '../api/index.js?v=20261001-4';
+import { fresh, withLoader, loaderHTML, html, esc, $, $$, toast, rupees, yrs, km, initials, modal, on } from '../lib/dom.js?v=20261001-4';
+import { ACTIVITIES, SKILLS, LANGUAGES, WORK_LABEL } from '../lib/constants.js?v=20261001-4';
+import { distanceKm, geocode } from '../lib/geo.js?v=20261001-4';
+import { options } from './widgets.js?v=20261001-4';
+import { state } from '../app.js?v=20261001-4';
 
 const MODES = [
   ['all', 'All teachers', ''],
@@ -77,19 +77,17 @@ export async function browseTeachers(el, _p, q) {
     const tags = [...acts, ...(t.skills || []).filter((s) => !acts.includes(s))];
     const picks = new Set(f.picks);
     const pl = priceLine(t);
-    return html`<article class="tcard">
-      <div class="tcard-top"><span class="avatar">${initials(t.full_name)}</span>
-        <div class="grow"><a class="tname" href="#/teachers/${t.id}" data-open="${t.id}">${t.full_name}</a>
-          <div class="muted small">${t.qualification || (worksOf(t).includes('class') ? 'Preschool teacher' : 'Extracurricular instructor')}</div></div>
+    const travel = t.travel_km ? (d != null && !willTravel(t, d) ? html`<span class="beyond-badge">🚗 Usually ≤ ${t.travel_km} km</span>` : html`<span>🚗 Travels ${t.travel_km >= 50 ? '50+' : t.travel_km} km</span>`) : '';
+    // Same design as the job cards: the whole card is one link to the profile
+    return html`<a class="jcard tcard-link" href="#/teachers/${t.id}" data-open="${t.id}" aria-label="${t.full_name} — view profile">
+      <div class="jcard-top"><span class="avatar">${initials(t.full_name)}</span>
+        <div class="grow"><h3>${t.full_name}</h3><p class="muted small">${t.qualification || (worksOf(t).includes('class') ? 'Preschool teacher' : 'Extracurricular instructor')}</p></div>
         ${d != null ? html`<span class="dist">📍 ${km(d)}</span>` : ''}</div>
-      <div class="chips">${worksOf(t).map((w) => html`<span class="chip chip-work">${WORK_LABEL[w] || w}</span>`)}</div>
-      <div class="tfacts"><span>🎓 ${yrs(t.experience_years)}</span>${pl ? html`<span class="fee">💰 ${pl}</span>` : ''}
-        ${t.video_path || t.video_link || t.has_video ? html`<span class="good">🎬 Video</span>` : ''}${t.travel_km ? (d != null && !willTravel(t, d) ? html`<span class="beyond-badge">🚗 Usually ≤ ${t.travel_km} km</span>` : html`<span>🚗 Travels ${t.travel_km >= 50 ? '50+' : t.travel_km} km</span>`) : ''}</div>
-      <div class="chips">${tags.slice(0, 7).map((s) => html`<span class="chip ${picks.has(s) ? 'chip-match' : 'chip-skill'}">${s}</span>`)}</div>
-      ${t.about ? html`<p class="small muted clamp">${t.about}</p>` : ''}
-      <div class="row"><a class="btn ${full ? 'btn-primary' : 'btn-ghost'} btn-sm" href="#/teachers/${t.id}" data-open="${t.id}">View profile</a>
-        ${full && t.phone ? html`<a class="btn btn-ghost btn-sm" target="_blank" rel="noopener" href="https://wa.me/91${t.whatsapp || t.phone}">💬 WhatsApp</a>` : ''}</div>
-    </article>`;
+      <div class="tfacts">${pl ? html`<span class="good">💰 ${pl}</span>` : ''}<span>🎓 ${yrs(t.experience_years)}</span>
+        ${t.video_path || t.video_link || t.has_video ? html`<span>🎬 Video</span>` : ''}</div>
+      <div class="chips">${worksOf(t).map((w) => html`<span class="chip chip-work">${WORK_LABEL[w] || w}</span>`)}${tags.slice(0, 5).map((x) => html`<span class="chip ${picks.has(x) ? 'chip-match' : 'chip-skill'}">${x}</span>`)}</div>
+      <div class="jcard-foot"><span class="muted small">${travel}</span><span class="jcard-more">View profile →</span></div>
+    </a>`;
   };
 
   const render = () => {
