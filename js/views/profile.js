@@ -1,5 +1,5 @@
 import { api } from '../api/index.js';
-import { html, esc, $, $$, toast, setBusy, formData, num, rupees, yrs, km, initials, statusBadge, langList, yesNo, modal } from '../lib/dom.js';
+import { withLoader, html, esc, $, $$, toast, setBusy, formData, num, rupees, yrs, km, initials, statusBadge, langList, yesNo, modal } from '../lib/dom.js';
 import { CURRICULA, AGES, QUALIFICATIONS, ACTIVITIES, WORK_TYPES, WORK_LABEL } from '../lib/constants.js';
 import { isValidAadhaar, cleanAadhaar, formatAadhaar, isValidPhone, cleanPhone, isEmail, normalizeUrl } from '../lib/validate.js';
 import { locationField, mountLocationField, readLocation, distanceKm, gmapsUrl, gmapsDirections } from '../lib/geo.js';
@@ -256,7 +256,7 @@ export async function videoBlock(t) {
 }
 
 export async function teacherView(el, { id }, q) {
-  const t = await api.getTeacher(id);
+  const t = await withLoader(api.getTeacher(id), 600);
   if (!t) { el.innerHTML = esc(html`<section class="page narrow center"><h1>Profile not available</h1><p class="muted">This teacher's profile isn't visible to you${state.user?.role === 'school' && state.profile?.status !== 'approved' ? ' until your school is verified' : ''}.</p></section>`); return; }
   let origin = null, jobs = [];
   if (state.user?.role === 'school') {

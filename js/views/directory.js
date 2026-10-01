@@ -1,6 +1,6 @@
 // Browse teachers: class teachers, extracurricular instructors and one-time event performers.
 import { api } from '../api/index.js';
-import { fresh, html, esc, $, $$, toast, rupees, yrs, km, initials, modal, on } from '../lib/dom.js';
+import { fresh, withLoader, html, esc, $, $$, toast, rupees, yrs, km, initials, modal, on } from '../lib/dom.js';
 import { ACTIVITIES, SKILLS, LANGUAGES, WORK_LABEL } from '../lib/constants.js';
 import { distanceKm, geocode } from '../lib/geo.js';
 import { options } from './widgets.js';
@@ -18,7 +18,7 @@ export async function browseTeachers(el, _p, q) {
   el = fresh(el);
   const u = state.user;
   const full = u?.role === 'admin' || (u?.role === 'school' && state.profile?.status === 'approved');
-  const rows = await api.listTeacherDirectory(full);
+  const rows = await withLoader(api.listTeacherDirectory(full), 1100);
   const f = {
     mode: MODES.some((m) => m[0] === q.type) ? q.type : 'all',
     picks: q.activity ? [q.activity] : [],

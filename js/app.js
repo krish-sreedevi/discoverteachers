@@ -1,5 +1,5 @@
 import { initApi, api } from './api/index.js';
-import { html, esc, $, toast } from './lib/dom.js';
+import { html, esc, $, toast, loaderHTML } from './lib/dom.js';
 
 export const state = { user: null, profile: null };
 
@@ -21,6 +21,14 @@ export function homeFor(user) {
 }
 
 // ---------- routes ----------
+// What the branded loader says while each page fetches its data
+const LOADER_MSG = {
+  '/jobs': 'Finding jobs near you', '/jobs/:id': 'Loading job', '/teachers': 'Finding teachers near you',
+  '/teachers/:id': 'Loading teacher profile', '/schools/:id': 'Loading school', '/school': 'Loading your dashboard',
+  '/school/jobs/:id': 'Finding teachers for this role', '/school/jobs/:id/edit': 'Loading listing', '/teacher': 'Finding jobs for you',
+  '/admin': 'Loading admin dashboard', '/teacher/profile': 'Loading your profile', '/school/profile': 'Loading school profile',
+};
+
 const routes = [
   ['/', () => import('./views/home.js'), 'home'],
   ['/login', () => import('./views/auth.js'), 'login'],
@@ -48,7 +56,7 @@ function match(path) {
     const keys = [];
     const re = new RegExp('^' + pattern.replace(/:(\w+)/g, (_, k) => { keys.push(k); return '([^/]+)'; }) + '/?$');
     const m = path.match(re);
-    if (m) return { loader, fn, role, allowIncomplete, params: Object.fromEntries(keys.map((k, i) => [k, decodeURIComponent(m[i + 1])])) };
+    if (m) return { pattern, loader, fn, role, allowIncomplete, params: Object.fromEntries(keys.map((k, i) => [k, decodeURIComponent(m[i + 1])])) };
   }
   return null;
 }
@@ -74,13 +82,16 @@ export async function route() {
   }
   main.setAttribute('aria-busy', 'true');
   try {
+    const view = document.createElement('div'); view.className = 'view';
+    const msg = LOADER_MSG[r.pattern];
+    if (msg) { view.innerHTML = loaderHTML(msg); main.replaceChildren(view); window.scrollTo(0, 0); }
+    else setTimeout(() => { const v = main.firstElementChild; if (seq === routeSeq && v && v.classList.contains('view') && !v.innerHTML.trim()) v.innerHTML = loaderHTML('Loading'); }, 150);
     const mod = await r.loader();
     if (seq !== routeSeq) return;
-    window.scrollTo(0, 0);
-    const view = document.createElement('div'); view.className = 'view';
-    main.replaceChildren(view);
+    if (!msg) { main.replaceChildren(view); window.scrollTo(0, 0); }
     await mod[r.fn](view, r.params, query);
   } catch (e) {
+    if (e && e.aborted) return;
     console.error(e);
     if (seq === routeSeq) main.innerHTML = esc(html`<section class="page narrow center"><h1>Something went wrong</h1><p class="muted">${e.message}</p><p><a class="btn btn-primary" href="#/">Go home</a></p></section>`);
   } finally { main.removeAttribute('aria-busy'); }

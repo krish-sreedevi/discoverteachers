@@ -1,5 +1,5 @@
 import { api } from '../api/index.js';
-import { fresh, html, esc, $, $$, toast, setBusy, salaryRange, payRange, km, ago, statusBadge, langList, yesNo, modal } from '../lib/dom.js';
+import { fresh, withLoader, showLoader, html, esc, $, $$, toast, setBusy, salaryRange, payRange, km, ago, statusBadge, langList, yesNo, modal } from '../lib/dom.js';
 import { distanceKm, baseMap, pinIcon, gmapsDirections, gmapsUrl } from '../lib/geo.js';
 import { options } from './widgets.js';
 import { JOB_TYPE_LABEL, jobWorkType } from '../lib/constants.js';
@@ -22,7 +22,7 @@ export function jobCard(j, { dist, app } = {}) {
 
 export async function browse(el, _p, q) {
   const me = state.user?.role === 'teacher' ? state.profile : null;
-  const [jobs, apps] = await Promise.all([api.listOpenJobs(), me ? api.myApplications().catch(() => []) : []]);
+  const [jobs, apps] = await withLoader(Promise.all([api.listOpenJobs(), me ? api.myApplications().catch(() => []) : []]), 1100);
   const appBy = Object.fromEntries(apps.map((a) => [a.job_id, a]));
   const all = jobs.map((j) => ({ ...j, _dist: me ? distanceKm(me, j) : null }));
   const curricula = [...new Set(all.map((j) => j.curriculum).filter(Boolean))];
@@ -68,7 +68,8 @@ export async function browse(el, _p, q) {
 
 export async function detail(el, { id }) {
   el = fresh(el);
-  const j = await api.getJob(id);
+  if (!el.querySelector('.dt-loader')) showLoader(el, 'Loading job');
+  const j = await withLoader(api.getJob(id), 600);
   if (!j) { el.innerHTML = esc(html`<section class="page narrow center"><h1>Job not found</h1><p class="muted">It may have been filled or closed.</p><a class="btn btn-primary" href="#/jobs">Browse jobs</a></section>`); return; }
   const u = state.user, me = u?.role === 'teacher' ? state.profile : null;
   const app = me ? (await api.myApplications()).find((a) => a.job_id === id) : null;

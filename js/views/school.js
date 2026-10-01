@@ -1,5 +1,5 @@
 import { api } from '../api/index.js';
-import { fresh, html, esc, $, $$, toast, setBusy, formData, num, rupees, salaryRange, payRange, yrs, km, ago, initials, statusBadge, langList, yesNo, confirmBox, on } from '../lib/dom.js';
+import { fresh, withLoader, html, esc, $, $$, toast, setBusy, formData, num, rupees, salaryRange, payRange, yrs, km, ago, initials, statusBadge, langList, yesNo, confirmBox, on } from '../lib/dom.js';
 import { SKILLS, APP_STATUSES, PROF_RANK, CURRICULA, ACTIVITIES, JOB_TYPES, JOB_TYPE_LABEL, jobWorkType } from '../lib/constants.js';
 import { locationField, mountLocationField, readLocation, distanceKm, baseMap, pinIcon } from '../lib/geo.js';
 import { languagesField, skillsField, yesNoField, mountRepeaters, readRepeater, options } from './widgets.js';
@@ -14,7 +14,7 @@ function verifyBanner() {
 
 // =====================================================================
 export async function dashboard(el) {
-  const [jobs, apps] = await Promise.all([api.listMyJobs(), api.schoolApplications().catch(() => [])]);
+  const [jobs, apps] = await withLoader(Promise.all([api.listMyJobs(), api.schoolApplications().catch(() => [])]), 600);
   const byJob = {};
   apps.forEach((a) => { (byJob[a.job_id] ||= []).push(a); });
   const open = jobs.filter((j) => j.status === 'open');
@@ -175,7 +175,7 @@ export async function jobManage(el, { id }, q) {
   const job = (await api.listMyJobs()).find((x) => x.id === id);
   if (!job) { toast('Listing not found', 'error'); return go('/school'); }
   const approved = state.profile.status === 'approved';
-  const [teachers, allApps] = await Promise.all([approved ? api.listTeachers() : [], api.schoolApplications().catch(() => [])]);
+  const [teachers, allApps] = await withLoader(Promise.all([approved ? api.listTeachers() : [], api.schoolApplications().catch(() => [])]), 1100);
   let apps = allApps.filter((a) => a.job_id === id);
   const appByTeacher = () => Object.fromEntries(apps.map((a) => [a.teacher_id, a]));
   const pool = new Map(teachers.map((t) => [t.id, t]));

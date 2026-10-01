@@ -1,5 +1,5 @@
 import { api } from '../api/index.js';
-import { fresh, html, esc, $, toast, salaryRange, payRange, ago, statusBadge, on } from '../lib/dom.js';
+import { fresh, withLoader, showLoader, html, esc, $, toast, salaryRange, payRange, ago, statusBadge, on } from '../lib/dom.js';
 import { distanceKm } from '../lib/geo.js';
 import { jobCard } from './jobs.js';
 import { jobWorkType } from '../lib/constants.js';
@@ -7,8 +7,9 @@ import { state } from '../app.js';
 
 export async function dashboard(el) {
   el = fresh(el);
+  if (!el.querySelector('.dt-loader')) showLoader(el, 'Finding jobs for you');
   const t = state.profile;
-  const [apps, jobs] = await Promise.all([api.myApplications(), api.listOpenJobs()]);
+  const [apps, jobs] = await withLoader(Promise.all([api.myApplications(), api.listOpenJobs()]), 900);
   const invites = apps.filter((a) => a.status === 'invited' && a.job);
   const active = apps.filter((a) => a.status !== 'invited' && a.job);
   const appBy = Object.fromEntries(apps.map((a) => [a.job_id, a]));

@@ -17,7 +17,7 @@ export function html(strings, ...vals) {
 }
 
 // Swap a view container for a fresh one so delegated listeners from a previous render don't pile up.
-export function fresh(el) { const n = document.createElement('div'); n.className = 'view'; el.replaceWith(n); return n; }
+export function fresh(el) { const n = document.createElement('div'); n.className = 'view'; n.innerHTML = el.innerHTML; el.replaceWith(n); return n; }
 
 export const $ = (sel, root = document) => root.querySelector(sel);
 export const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
@@ -128,4 +128,27 @@ const PAY_UNIT = { month: '/month', session: '/session', event: ' total', hour: 
 export function payRange(min, max, unit = 'month') {
   const r = salaryRange(min, max);
   return r === 'Not specified' ? r : r + (PAY_UNIT[unit] || '');
+}
+
+// ---------- branded loader (the logo's magnifier draws itself, on a loop) ----------
+const LOADER_SVG = '<svg class="dtl-mark" viewBox="22 12 112 112" aria-hidden="true"><g transform="translate(16,8)"><g class="dtl-lens">'
+  + '<circle class="dtl-ring" cx="52" cy="52" r="37" transform="rotate(-135 52 52)"/>'
+  + '<line class="dtl-handle" x1="80" y1="80" x2="104" y2="104"/>'
+  + '<circle class="dtl-head" cx="52" cy="36" r="8"/>'
+  + '<path class="dtl-pg dtl-pl" d="M49 52 C43 47 35 46 28 48 L28 70 C35 68 43 69 49 74 Z"/>'
+  + '<path class="dtl-pg dtl-pr" d="M55 52 C61 47 69 46 76 48 L76 70 C69 68 61 69 55 74 Z"/></g></g></svg>';
+
+export function loaderHTML(message = 'Loading…', { compact = false } = {}) {
+  return `<div class="dt-loader${compact ? ' dt-loader-compact' : ''}" role="status" aria-live="polite">${LOADER_SVG}<p class="dtl-msg">${esc(message)}</p></div>`;
+}
+export function showLoader(el, message, opts) { if (el) el.innerHTML = loaderHTML(message, opts); }
+export const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+// Keep the loader up for at least `min` ms so it reads as intentional rather than a flicker.
+// If the visitor navigates away meanwhile, it throws a quiet "aborted" error so the old page never renders over the new one.
+export async function withLoader(promise, min = 900) {
+  const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const at = location.hash;
+  const [v] = await Promise.all([promise, sleep(reduce ? 0 : min)]);
+  if (location.hash !== at) { const e = new Error('navigated away'); e.aborted = true; throw e; }
+  return v;
 }

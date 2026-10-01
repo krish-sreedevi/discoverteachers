@@ -1,5 +1,5 @@
 import { api } from '../api/index.js';
-import { fresh, html, esc, $, $$, toast, setBusy, modal, rupees, salaryRange, payRange, yrs, ago, statusBadge, langList, yesNo, on } from '../lib/dom.js';
+import { fresh, loaderHTML, html, esc, $, $$, toast, setBusy, modal, rupees, salaryRange, payRange, yrs, ago, statusBadge, langList, yesNo, on } from '../lib/dom.js';
 import { formatAadhaar, isValidAadhaar } from '../lib/validate.js';
 import { gmapsUrl } from '../lib/geo.js';
 import { videoBlock } from './profile.js';
@@ -32,7 +32,7 @@ export async function dashboard(el) {
 
   let rows = [];
   const load = async () => {
-    $('[data-table]', el).innerHTML = '<p class="muted">Loading…</p>';
+    $('[data-table]', el).innerHTML = loaderHTML(st.tab === 'jobs' ? 'Loading jobs' : st.tab === 'school' ? 'Loading schools' : 'Loading teachers', { compact: true });
     rows = st.tab === 'jobs' ? await api.adminJobs() : await api.adminList(st.tab);
     render();
   };
