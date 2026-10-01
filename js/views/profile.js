@@ -1,10 +1,10 @@
-import { api } from '../api/index.js?v=20261001-6';
-import { withLoader, html, esc, $, $$, toast, setBusy, formData, num, rupees, yrs, km, initials, statusBadge, langList, yesNo, modal } from '../lib/dom.js?v=20261001-6';
-import { CURRICULA, AGES, QUALIFICATIONS, ACTIVITIES, WORK_TYPES, WORK_LABEL } from '../lib/constants.js?v=20261001-6';
-import { isValidAadhaar, cleanAadhaar, formatAadhaar, isValidPhone, cleanPhone, isEmail, normalizeUrl } from '../lib/validate.js?v=20261001-6';
-import { locationField, mountLocationField, readLocation, distanceKm, gmapsUrl, gmapsDirections } from '../lib/geo.js?v=20261001-6';
-import { languagesField, experienceField, skillsField, yesNoField, mountRepeaters, readRepeater, options } from './widgets.js?v=20261001-6';
-import { state, refreshProfile, go } from '../app.js?v=20261001-6';
+import { api } from '../api/index.js?v=20261001-7';
+import { withLoader, html, esc, $, $$, toast, setBusy, formData, num, rupees, yrs, km, initials, statusBadge, langList, yesNo, modal } from '../lib/dom.js?v=20261001-7';
+import { CURRICULA, AGES, QUALIFICATIONS, ACTIVITIES, WORK_TYPES, WORK_LABEL } from '../lib/constants.js?v=20261001-7';
+import { isValidAadhaar, cleanAadhaar, formatAadhaar, isValidPhone, cleanPhone, isEmail, normalizeUrl } from '../lib/validate.js?v=20261001-7';
+import { locationField, mountLocationField, readLocation, distanceKm, gmapsUrl, gmapsDirections } from '../lib/geo.js?v=20261001-7';
+import { languagesField, experienceField, skillsField, yesNoField, mountRepeaters, readRepeater, options } from './widgets.js?v=20261001-7';
+import { state, refreshProfile, go } from '../app.js?v=20261001-7';
 
 const MB = 1024 * 1024;
 

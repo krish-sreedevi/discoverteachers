@@ -1,6 +1,6 @@
 // Reusable form widgets: language/proficiency rows, experience rows, skill chips, selects.
-import { html, esc, $$ } from '../lib/dom.js?v=20261001-6';
-import { LANGUAGES, PROFICIENCY, SKILLS } from '../lib/constants.js?v=20261001-6';
+import { html, esc, $$ } from '../lib/dom.js?v=20261001-7';
+import { LANGUAGES, PROFICIENCY, SKILLS } from '../lib/constants.js?v=20261001-7';
 
 export function options(list, selected, { placeholder } = {}) {
   return html`${placeholder != null ? html`<option value="">${placeholder}</option>` : ''}${list.map((o) => {

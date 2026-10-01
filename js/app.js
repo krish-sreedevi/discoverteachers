@@ -1,5 +1,5 @@
-import { initApi, api } from './api/index.js?v=20261001-6';
-import { html, esc, $, toast, loaderHTML } from './lib/dom.js?v=20261001-6';
+import { initApi, api } from './api/index.js?v=20261001-7';
+import { html, esc, $, toast, loaderHTML } from './lib/dom.js?v=20261001-7';
 
 export const state = { user: null, profile: null };
 
@@ -30,25 +30,25 @@ const LOADER_MSG = {
 };
 
 const routes = [
-  ['/', () => import('./views/home.js?v=20261001-6'), 'home'],
-  ['/login', () => import('./views/auth.js?v=20261001-6'), 'login'],
-  ['/register', () => import('./views/auth.js?v=20261001-6'), 'register'],
-  ['/admin/login', () => import('./views/auth.js?v=20261001-6'), 'adminLogin'],
-  ['/forgot', () => import('./views/auth.js?v=20261001-6'), 'forgot'],
-  ['/reset', () => import('./views/auth.js?v=20261001-6'), 'reset'],
-  ['/jobs', () => import('./views/jobs.js?v=20261001-6'), 'browse'],
-  ['/jobs/:id', () => import('./views/jobs.js?v=20261001-6'), 'detail'],
-  ['/school', () => import('./views/school.js?v=20261001-6'), 'dashboard', 'school'],
-  ['/school/profile', () => import('./views/profile.js?v=20261001-6'), 'schoolForm', 'school', true],
-  ['/school/jobs/new', () => import('./views/school.js?v=20261001-6'), 'jobForm', 'school'],
-  ['/school/jobs/:id/edit', () => import('./views/school.js?v=20261001-6'), 'jobForm', 'school'],
-  ['/school/jobs/:id', () => import('./views/school.js?v=20261001-6'), 'jobManage', 'school'],
-  ['/teacher', () => import('./views/teacher.js?v=20261001-6'), 'dashboard', 'teacher'],
-  ['/teacher/profile', () => import('./views/profile.js?v=20261001-6'), 'teacherForm', 'teacher', true],
-  ['/teachers', () => import('./views/directory.js?v=20261001-6'), 'browseTeachers'],
-  ['/teachers/:id', () => import('./views/profile.js?v=20261001-6'), 'teacherView', ['school', 'admin', 'teacher']],
-  ['/schools/:id', () => import('./views/profile.js?v=20261001-6'), 'schoolView'],
-  ['/admin', () => import('./views/admin.js?v=20261001-6'), 'dashboard', 'admin'],
+  ['/', () => import('./views/home.js?v=20261001-7'), 'home'],
+  ['/login', () => import('./views/auth.js?v=20261001-7'), 'login'],
+  ['/register', () => import('./views/auth.js?v=20261001-7'), 'register'],
+  ['/admin/login', () => import('./views/auth.js?v=20261001-7'), 'adminLogin'],
+  ['/forgot', () => import('./views/auth.js?v=20261001-7'), 'forgot'],
+  ['/reset', () => import('./views/auth.js?v=20261001-7'), 'reset'],
+  ['/jobs', () => import('./views/jobs.js?v=20261001-7'), 'browse'],
+  ['/jobs/:id', () => import('./views/jobs.js?v=20261001-7'), 'detail'],
+  ['/school', () => import('./views/school.js?v=20261001-7'), 'dashboard', 'school'],
+  ['/school/profile', () => import('./views/profile.js?v=20261001-7'), 'schoolForm', 'school', true],
+  ['/school/jobs/new', () => import('./views/school.js?v=20261001-7'), 'jobForm', 'school'],
+  ['/school/jobs/:id/edit', () => import('./views/school.js?v=20261001-7'), 'jobForm', 'school'],
+  ['/school/jobs/:id', () => import('./views/school.js?v=20261001-7'), 'jobManage', 'school'],
+  ['/teacher', () => import('./views/teacher.js?v=20261001-7'), 'dashboard', 'teacher'],
+  ['/teacher/profile', () => import('./views/profile.js?v=20261001-7'), 'teacherForm', 'teacher', true],
+  ['/teachers', () => import('./views/directory.js?v=20261001-7'), 'browseTeachers'],
+  ['/teachers/:id', () => import('./views/profile.js?v=20261001-7'), 'teacherView', ['school', 'admin', 'teacher']],
+  ['/schools/:id', () => import('./views/profile.js?v=20261001-7'), 'schoolView'],
+  ['/admin', () => import('./views/admin.js?v=20261001-7'), 'dashboard', 'admin'],
 ];
 
 function match(path) {
