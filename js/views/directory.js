@@ -1,6 +1,6 @@
 // Browse teachers: class teachers, extracurricular instructors and one-time event performers.
 import { api } from '../api/index.js';
-import { fresh, withLoader, html, esc, $, $$, toast, rupees, yrs, km, initials, modal, on } from '../lib/dom.js';
+import { fresh, withLoader, loaderHTML, html, esc, $, $$, toast, rupees, yrs, km, initials, modal, on } from '../lib/dom.js';
 import { ACTIVITIES, SKILLS, LANGUAGES, WORK_LABEL } from '../lib/constants.js';
 import { distanceKm, geocode } from '../lib/geo.js';
 import { options } from './widgets.js';
@@ -12,13 +12,14 @@ const MODES = [
   ['extracurricular', 'Extracurricular', '🎨'],
   ['event', 'One-time events', '🎉'],
 ];
+const willTravel = (t, d) => d == null || !t.travel_km || t.travel_km >= 50 || d <= t.travel_km;
 const worksOf = (t) => (t.work_types && t.work_types.length ? t.work_types : ['class']);
 
 export async function browseTeachers(el, _p, q) {
   el = fresh(el);
   const u = state.user;
   const full = u?.role === 'admin' || (u?.role === 'school' && state.profile?.status === 'approved');
-  const rows = await withLoader(api.listTeacherDirectory(full), 1100);
+  const rows = await withLoader(api.listTeacherDirectory(full), 1600);
   const f = {
     mode: MODES.some((m) => m[0] === q.type) ? q.type : 'all',
     picks: q.activity ? [q.activity] : [],
@@ -46,6 +47,7 @@ export async function browseTeachers(el, _p, q) {
         <label data-budgetlabel>Budget up to (₹)<input type="number" name="budget" min="0" step="100" placeholder="Any"></label>
         <label>Speaks<select name="lang">${options(LANGUAGES, '', { placeholder: 'Any language' })}</select></label>
         <label class="check"><input type="checkbox" name="video"> Has a teaching video</label>
+        <label class="check" data-radiuswrap ${f.origin ? '' : 'hidden'}><input type="checkbox" name="radius" checked> Only teachers willing to travel this far</label>
         <label>Sort by<select name="sort">${options([['near', 'Nearest first'], ['exp', 'Most experienced'], ['price', 'Lowest price']], f.sort)}</select></label>
       </aside>
       <div class="results"><div class="results-head"><p data-count></p></div><div class="cards" data-list></div></div>
@@ -82,7 +84,7 @@ export async function browseTeachers(el, _p, q) {
         ${d != null ? html`<span class="dist">📍 ${km(d)}</span>` : ''}</div>
       <div class="chips">${worksOf(t).map((w) => html`<span class="chip chip-work">${WORK_LABEL[w] || w}</span>`)}</div>
       <div class="tfacts"><span>🎓 ${yrs(t.experience_years)}</span>${pl ? html`<span class="fee">💰 ${pl}</span>` : ''}
-        ${t.video_path || t.video_link || t.has_video ? html`<span class="good">🎬 Video</span>` : ''}${t.travel_km ? html`<span>🚗 travels ${t.travel_km} km</span>` : ''}</div>
+        ${t.video_path || t.video_link || t.has_video ? html`<span class="good">🎬 Video</span>` : ''}${t.travel_km ? (d != null && !willTravel(t, d) ? html`<span class="beyond-badge">🚗 Usually ≤ ${t.travel_km} km</span>` : html`<span>🚗 Travels ${t.travel_km >= 50 ? '50+' : t.travel_km} km</span>`) : ''}</div>
       <div class="chips">${tags.slice(0, 7).map((s) => html`<span class="chip ${picks.has(s) ? 'chip-match' : 'chip-skill'}">${s}</span>`)}</div>
       ${t.about ? html`<p class="small muted clamp">${t.about}</p>` : ''}
       <div class="row"><a class="btn ${full ? 'btn-primary' : 'btn-ghost'} btn-sm" href="#/teachers/${t.id}" data-open="${t.id}">View profile</a>
@@ -106,6 +108,7 @@ export async function browseTeachers(el, _p, q) {
       if (f.picks.length) { const have = new Set([...(t.activities || []), ...(t.skills || [])]); if (!f.picks.some((p) => have.has(p))) return false; }
       if (f.lang && !(t.languages || []).some((l) => l.language?.toLowerCase() === f.lang.toLowerCase())) return false;
       if (f.video && !(t.video_path || t.video_link || t.has_video)) return false;
+      if (f.origin && v('radius').checked && !willTravel(t, t._dist)) return false;
       return true;
     }).sort((a, b) => (f.sort === 'exp' ? (b.experience_years || 0) - (a.experience_years || 0)
       : f.sort === 'price' ? (price(a) || 1e9) - (price(b) || 1e9)
@@ -118,10 +121,13 @@ export async function browseTeachers(el, _p, q) {
 
   const setOrigin = (o) => {
     f.origin = o; $('[data-origin]', el).textContent = o ? `Distances from ${o.label}` : 'Set a location to sort by distance';
-    $('[data-distwrap]', el).hidden = !o; if (o && Number(panel.querySelector('[name=dist]').value) > 50) panel.querySelector('[name=dist]').value = 15;
+    $('[data-distwrap]', el).hidden = !o; $('[data-radiuswrap]', el).hidden = !o; if (o && Number(panel.querySelector('[name=dist]').value) > 50) panel.querySelector('[name=dist]').value = 15;
     render();
   };
-  on(el, 'click', '[data-mode]', (e, b) => { f.mode = b.dataset.mode; renderPicks(); render(); history.replaceState(null, '', `#/teachers${f.mode !== 'all' ? '?type=' + f.mode : ''}`); });
+  on(el, 'click', '[data-mode]', (e, b) => {
+    f.mode = b.dataset.mode; renderPicks();
+    $('[data-count]', el).innerHTML = ''; $('[data-list]', el).innerHTML = loaderHTML({ class: 'Finding class teachers', extracurricular: 'Finding instructors', event: 'Finding event performers' }[f.mode] || 'Finding teachers', { compact: true });
+    clearTimeout(el._t); el._t = setTimeout(render, 700); history.replaceState(null, '', `#/teachers${f.mode !== 'all' ? '?type=' + f.mode : ''}`); });
   panel.addEventListener('input', (e) => { if (!e.target.matches('[data-near]')) render(); });
   $('[data-me]', el).onclick = () => {
     if (!navigator.geolocation) return toast('Location isn\'t available in this browser', 'error');

@@ -78,6 +78,7 @@ export async function seedData(hash) {
   teachers.forEach((t) => {
     Object.assign(t, { work_types: ['class'], activities: [], session_fee: null, event_fee: null, travel_km: null }, X[t.id] || {});
     if (!t.work_types.includes('class')) { t.expected_salary = null; t.qualification = null; }
+    if (!t.travel_km) t.travel_km = { 't-priya': 5, 't-kavya': 10, 't-sana': 15, 't-deepa': 5, 't-rhea': 20, 't-anjali': 10, 't-lakshmi': 10, 't-nisha': 5, 't-meera': 5 }[t.id] || 10;
   });
   users.forEach((u) => { u.pw = pw; u.created_at = daysAgo(30); });
 

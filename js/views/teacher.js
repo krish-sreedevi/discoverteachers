@@ -13,12 +13,15 @@ export async function dashboard(el) {
   const invites = apps.filter((a) => a.status === 'invited' && a.job);
   const active = apps.filter((a) => a.status !== 'invited' && a.job);
   const appBy = Object.fromEntries(apps.map((a) => [a.job_id, a]));
-  const near = jobs.map((j) => ({ ...j, _dist: distanceKm(t, j) })).filter((j) => !appBy[j.id] && (t.work_types && t.work_types.length ? t.work_types : ['class']).includes(jobWorkType(j.job_type)))
-    .sort((a, b) => (a._dist ?? 1e9) - (b._dist ?? 1e9)).slice(0, 4);
+  const nearAll = jobs.map((j) => ({ ...j, _dist: distanceKm(t, j) })).filter((j) => !appBy[j.id] && (t.work_types && t.work_types.length ? t.work_types : ['class']).includes(jobWorkType(j.job_type)))
+    .sort((a, b) => (a._dist ?? 1e9) - (b._dist ?? 1e9));
+  const radius = t.travel_km && t.travel_km < 50 ? t.travel_km : null;
+  const inside = radius ? nearAll.filter((j) => j._dist != null && j._dist <= radius) : nearAll;
+  const near = (inside.length ? inside : nearAll).slice(0, 4);
 
   const checks = [
     ['Basic details & Aadhaar', true],
-    ['Home location', t.lat != null],
+    ['Home location & travel radius', t.lat != null && !!t.travel_km],
     ['Skills', (t.skills || []).length > 0 || !!t.skills_other],
     ['Languages', (t.languages || []).length > 0],
     ['Experience details', (t.experience || []).length > 0 || Number(t.experience_years) === 0],
@@ -43,7 +46,7 @@ export async function dashboard(el) {
         <div class="card"><h2>My applications</h2>
           ${active.length ? html`<ul class="activity">${active.map((a) => html`<li><span class="grow"><a href="#/jobs/${a.job_id}">${a.job.title}</a><br><span class="muted small">${a.job.school?.name} · updated ${ago(a.updated_at)}</span></span>${statusBadge(a.status)}</li>`)}</ul>`
             : html`<p class="muted">You haven't applied anywhere yet.</p>`}</div>
-        <div class="card"><h2>Jobs near you</h2>${near.length ? html`<div class="cards">${near.map((j) => jobCard(j, { dist: j._dist }))}</div>
+        <div class="card"><h2>Jobs near you${radius && inside.length ? html` <small class="muted">· within ${radius} km</small>` : ''}</h2>${near.length ? html`<div class="cards">${near.map((j) => jobCard(j, { dist: j._dist }))}</div>
           <p class="mt"><a href="#/jobs">See all jobs →</a></p>` : html`<p class="muted">No open jobs right now — we'll show them here as schools post.</p>`}</div>
       </div>
       <div>

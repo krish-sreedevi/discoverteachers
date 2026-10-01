@@ -146,10 +146,9 @@ export async function teacherForm(el) {
       </div>
       <div class="card" data-show-for="extracurricular event"><h2>🎨 Extracurricular & events</h2>
         ${skillsField(t.activities || [], { name: 'activities', label: 'What can you teach or perform?', list: ACTIVITIES, otherName: null })}
-        <div class="grid3">
+        <div class="grid2">
           <label data-show-for="extracurricular">Fee per session (₹)<input name="session_fee" type="number" min="0" step="50" value="${t.session_fee ?? ''}" placeholder="e.g. 700"></label>
           <label data-show-for="event">Fee per event, from (₹)<input name="event_fee" type="number" min="0" step="500" value="${t.event_fee ?? ''}" placeholder="e.g. 5000"></label>
-          <label>How far will you travel? (km)<input name="travel_km" type="number" min="1" max="100" value="${t.travel_km ?? ''}" placeholder="e.g. 10"></label>
         </div>
       </div>
       <div class="card"><h2>Experience & skills</h2>
@@ -163,6 +162,10 @@ export async function teacherForm(el) {
       </div>
       <div class="card"><h2>Where you live</h2>
         ${locationField({ label: 'Home location', address: t.address, lat: t.lat, lng: t.lng, maps_link: t.maps_link, hint: 'Schools filter teachers by distance, so an approximate pin (your street or area) is enough. Your exact address is only shared with verified schools.' })}
+        <fieldset class="radius-field"><legend>How far from home are you willing to travel for work? <span class="req">*</span></legend>
+          <p class="hint">Schools within this distance will see you first, and we'll show you jobs inside it.</p>
+          <div class="radius-picks">${[2, 5, 10, 15, 20, 30, 50].map((k) => html`<label class="seg"><input type="radio" name="travel_km" value="${k}" ${Number(t.travel_km) === k ? 'checked' : ''}><span>${k === 50 ? '50+ km' : `${k} km`}</span></label>`)}</div>
+        </fieldset>
       </div>
       <div class="card highlight"><h2>🎬 Show how you teach <span class="tag">Highly recommended</span></h2>
         <p class="hint">A 1–3 minute video of you teaching a rhyme, telling a story or running an activity. Profiles with a video get far more interest from schools. Optional.</p>
@@ -214,6 +217,7 @@ export async function teacherForm(el) {
     const languages = readRepeater(form, 'languages');
     if (!languages.length) return err('Please add at least one language');
     if (!loc) return err('Please drop a pin for where you live');
+    if (!d.travel_km) return err('Please choose how far you\'re willing to travel');
     if (!d.address) return err('Please enter your address', 'address');
     const btn = form.querySelector('[type=submit]'); setBusy(btn, true, file ? 'Uploading video…' : 'Saving…');
     try {
@@ -275,6 +279,7 @@ export async function teacherView(el, { id }, q) {
       <div class="grow"><h1>${t.full_name} ${statusBadge(t.status)}</h1>
         <p class="muted">${t.qualification || 'Preschool teacher'} · ${yrs(t.experience_years)} experience</p>
         <p class="facts"><span>📍 ${t.address?.split(',').slice(-3).join(',').trim() || '—'}${dist != null ? html` · <strong>${km(dist)}</strong> from ${origin === state.profile ? 'your school' : 'the job'}` : ''}</span>
+          ${t.travel_km ? html`<span>🚗 Travels up to <strong>${t.travel_km >= 50 ? '50+' : t.travel_km} km</strong>${dist != null && dist > t.travel_km ? html` <em class="warn">(this is farther)</em>` : ''}</span>` : ''}
           ${t.expected_salary ? html`<span>💰 Expects <strong>${rupees(t.expected_salary)}</strong>/month</span>` : ''}</p>
         <div class="chips mt">${(t.work_types || ['class']).map((w) => html`<span class="chip chip-work">${WORK_LABEL[w] || w}</span>`)}</div>
       </div>
@@ -290,7 +295,7 @@ export async function teacherView(el, { id }, q) {
       <div>
         ${(t.activities || []).length ? html`<div class="card"><h2>🎨 Extracurricular & events</h2>
           <div class="chips">${t.activities.map((a) => html`<span class="chip chip-skill">${a}</span>`)}</div>
-          <dl class="kv mt">${t.session_fee ? html`<dt>Per session</dt><dd>${rupees(t.session_fee)}</dd>` : ''}${t.event_fee ? html`<dt>Events from</dt><dd>${rupees(t.event_fee)}</dd>` : ''}${t.travel_km ? html`<dt>Travels up to</dt><dd>${t.travel_km} km</dd>` : ''}</dl></div>` : ''}
+          <dl class="kv mt">${t.session_fee ? html`<dt>Per session</dt><dd>${rupees(t.session_fee)}</dd>` : ''}${t.event_fee ? html`<dt>Events from</dt><dd>${rupees(t.event_fee)}</dd>` : ''}</dl></div>` : ''}
         <div class="card"><h2>Skills</h2><div class="chips">${(t.skills || []).map((s) => html`<span class="chip chip-skill">${s}</span>`)}${t.skills_other ? html`<span class="chip">${t.skills_other}</span>` : ''}${!(t.skills || []).length && !t.skills_other ? html`<span class="muted">—</span>` : ''}</div></div>
         <div class="card"><h2>Languages</h2><div class="chips">${langList(t.languages)}</div></div>
         <div class="card"><h2>Contact</h2>

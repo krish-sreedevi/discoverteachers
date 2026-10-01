@@ -1,5 +1,5 @@
 import { api } from '../api/index.js';
-import { fresh, withLoader, showLoader, html, esc, $, $$, toast, setBusy, salaryRange, payRange, km, ago, statusBadge, langList, yesNo, modal } from '../lib/dom.js';
+import { fresh, withLoader, showLoader, loaderHTML, html, esc, $, $$, toast, setBusy, salaryRange, payRange, km, ago, statusBadge, langList, yesNo, modal } from '../lib/dom.js';
 import { distanceKm, baseMap, pinIcon, gmapsDirections, gmapsUrl } from '../lib/geo.js';
 import { options } from './widgets.js';
 import { JOB_TYPE_LABEL, jobWorkType } from '../lib/constants.js';
@@ -22,7 +22,7 @@ export function jobCard(j, { dist, app } = {}) {
 
 export async function browse(el, _p, q) {
   const me = state.user?.role === 'teacher' ? state.profile : null;
-  const [jobs, apps] = await withLoader(Promise.all([api.listOpenJobs(), me ? api.myApplications().catch(() => []) : []]), 1100);
+  const [jobs, apps] = await withLoader(Promise.all([api.listOpenJobs(), me ? api.myApplications().catch(() => []) : []]), 1600);
   const appBy = Object.fromEntries(apps.map((a) => [a.job_id, a]));
   const all = jobs.map((j) => ({ ...j, _dist: me ? distanceKm(me, j) : null }));
   const curricula = [...new Set(all.map((j) => j.curriculum).filter(Boolean))];
@@ -33,7 +33,7 @@ export async function browse(el, _p, q) {
     <div class="finder">
       <aside class="filters card" aria-label="Filters"><h2>Filters</h2>
         <label>Search<input type="search" name="q" value="${q.q || ''}" placeholder="Title, school, area…"></label>
-        ${me ? html`<label>Distance from home: <strong data-distlabel></strong><input type="range" name="dist" min="1" max="51" value="${q.dist || 51}"></label>` : ''}
+        ${me ? html`<label>Distance from home: <strong data-distlabel></strong><input type="range" name="dist" min="1" max="51" value="${q.dist || (me?.travel_km ? Math.min(me.travel_km, 51) : 51)}"></label>` : ''}
         <label data-minlabel>Minimum pay (₹)<input type="number" name="minSal" step="100" min="0" placeholder="Any"></label>
         <label>Curriculum<select name="curr">${options(curricula, '', { placeholder: 'Any' })}</select></label>
         <label class="check"><input type="checkbox" name="bus"> Bus / pick-up provided</label>
@@ -46,7 +46,9 @@ export async function browse(el, _p, q) {
   let mode = ['class', 'extracurricular', 'event'].includes(q.type) ? q.type : 'all';
   el.addEventListener('click', (e) => {
     const b = e.target.closest('[data-mode]'); if (!b) return;
-    mode = b.dataset.mode; el.querySelectorAll('[data-mode]').forEach((x) => x.setAttribute('aria-pressed', x === b)); render();
+    mode = b.dataset.mode; el.querySelectorAll('[data-mode]').forEach((x) => x.setAttribute('aria-pressed', x === b));
+    $('[data-count]', el).innerHTML = ''; $('[data-list]', el).innerHTML = loaderHTML('Finding jobs', { compact: true });
+    clearTimeout(el._t); el._t = setTimeout(render, 700);
   });
   const render = () => {
     $('[data-minlabel]', el).firstChild.textContent = { all: 'Minimum pay (₹)', class: 'Minimum salary (₹/month)', extracurricular: 'Minimum fee per session (₹)', event: 'Minimum event fee (₹)' }[mode];

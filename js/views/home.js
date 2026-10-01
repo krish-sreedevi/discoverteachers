@@ -1,22 +1,34 @@
 import { api } from '../api/index.js';
 import { html, esc } from '../lib/dom.js';
+import { ACTIVITIES } from '../lib/constants.js';
 import { jobCard } from './jobs.js';
 import { state, homeFor } from '../app.js';
 
+const ACTS = [['🧘', 'Yoga'], ['💃', 'Dance'], ['🎨', 'Art & craft'], ['🏺', 'Pottery'], ['🎵', 'Music & singing'], ['🥋', 'Karate / martial arts'], ['♟️', 'Chess'], ['🎩', 'Magic show']];
+
 export async function home(el) {
-  const jobs = (await api.listOpenJobs().catch(() => [])).slice(0, 3);
+  const [allJobs, teachers] = await Promise.all([api.listOpenJobs().catch(() => []), api.listTeacherDirectory(false).catch(() => [])]);
+  const jobs = allJobs.slice(0, 3);
   const u = state.user;
+  const dash = u ? `#${homeFor(u)}` : null;
+
+  const audiences = [
+    { key: 'school', ico: '🏫', title: 'For Schools', line: 'Hire verified teachers nearby.', chips: ['📍 Distance search', '🎬 Teaching videos', '✅ Verified'],
+      cta: u?.role === 'school' ? ['Go to dashboard', dash] : ['Register your school', '#/register?as=school'], alt: ['Browse teachers', '#/teachers?type=class'] },
+    { key: 'teacher', ico: '🍎', title: 'For Teachers', line: 'Get found by schools near home.', chips: ['👤 One profile', '💌 Invites', '🏠 Jobs near you'],
+      cta: u?.role === 'teacher' ? ['Go to dashboard', dash] : ['Create your profile', '#/register?as=teacher'], alt: ['Browse jobs', '#/jobs'] },
+    { key: 'event', ico: '🎉', title: 'For Events', line: 'Yoga, dance, art & more.', chips: ['📅 One-time events', '🔁 Weekly classes', '🎭 Workshops'],
+      cta: ['Find instructors', '#/teachers?type=event'], alt: ['Weekly classes', '#/teachers?type=extracurricular'] },
+  ];
+
   el.innerHTML = esc(html`
-  <section class="hero">
+  <section class="hero hero-v2">
     <div class="hero-inner">
       <div class="hero-copy">
-        <p class="eyebrow">For preschools & early-years teachers</p>
+        <div class="aud-pills"><a href="#aud-school">For Schools</a><a href="#aud-teacher">For Teachers</a><a href="#aud-event">For Events</a></div>
         <h1>Find the teacher your little ones will <span class="hl">love</span>.</h1>
-        <p class="lead">Discover Teachers connects preschools with verified teachers who live nearby — with skills like yoga, dance and art, and a short video showing how they teach.</p>
-        ${u ? html`<a class="btn btn-primary btn-lg" href="#${homeFor(u)}">Go to your dashboard →</a>` : html`<div class="hero-ctas">
-          <a class="cta cta-school" href="#/register?as=school"><span class="cta-ico">🏫</span><span><strong>I'm hiring</strong><small>Register your school</small></span></a>
-          <a class="cta cta-teacher" href="#/register?as=teacher"><span class="cta-ico">🍎</span><span><strong>I'm a teacher</strong><small>Create my profile</small></span></a>
-        </div>`}
+        <p class="lead">Verified preschool teachers and activity instructors — close to you.</p>
+        ${dash ? html`<a class="btn btn-primary btn-lg" href="${dash}">Go to your dashboard →</a>` : ''}
       </div>
       <div class="hero-art" aria-hidden="true">
         <img src="assets/mark.svg" alt="" class="hero-mark">
@@ -24,29 +36,42 @@ export async function home(el) {
       </div>
     </div>
   </section>
-  <section class="page">
-    <div class="how">
-      <div class="how-col"><h2>🏫 For schools</h2><ol class="steps">
-        <li><strong>Register & get verified.</strong> Share your details and proof of establishment.</li>
-        <li><strong>Post a job in a minute.</strong> We autofill your address, curriculum, languages, bus and food details.</li>
-        <li><strong>Filter teachers near you.</strong> By distance, experience, salary, languages and skills — then watch their teaching videos and invite the best.</li></ol></div>
-      <div class="how-col"><h2>🍎 For teachers</h2><ol class="steps">
-        <li><strong>Build one profile.</strong> Your experience, skills, languages and expected salary.</li>
-        <li><strong>Add a teaching video.</strong> Optional, but it's the best way to stand out.</li>
-        <li><strong>Get invited.</strong> Verified schools near your home find you, or you apply to jobs yourself.</li>
-          <li><strong>Teach a hobby?</strong> Yoga, dance, art or pottery instructors can offer weekly classes or one-time events too.</li></ol></div>
+
+  <section class="page home">
+    <div class="aud-cards">${audiences.map((a) => html`
+      <article class="aud-card aud-${a.key}" id="aud-${a.key}">
+        <div class="aud-ico">${a.ico}</div>
+        <h2>${a.title}</h2>
+        <p>${a.line}</p>
+        <ul class="aud-chips">${a.chips.map((c) => html`<li>${c}</li>`)}</ul>
+        <div class="aud-actions"><a class="btn btn-primary" href="${a.cta[1]}">${a.cta[0]}</a><a class="aud-alt" href="${a.alt[1]}">${a.alt[0]} →</a></div>
+      </article>`)}
     </div>
-    <div class="features">
-      <div class="feature"><span>✅</span><h3>Everyone is verified</h3><p>Schools submit proof of establishment; teachers are checked against Aadhaar. Aadhaar is never shown to schools.</p></div>
-      <div class="feature"><span>📍</span><h3>Distance-first search</h3><p>Every school and teacher is pinned on the map, so you see who can reach you easily.</p></div>
-      <div class="feature"><span>🎬</span><h3>See them teach</h3><p>Short classroom videos tell you more than any CV.</p></div>
+
+    <div class="stat-strip">
+      <a href="#/teachers"><b>${teachers.length}</b><span>verified teachers</span></a>
+      <a href="#/jobs"><b>${allJobs.length}</b><span>open jobs</span></a>
+      <a href="#/teachers?type=extracurricular"><b>${ACTIVITIES.length}+</b><span>activities</span></a>
+      <a href="#/jobs"><b>${allJobs.filter((j) => j.job_type === 'event').length}</b><span>upcoming events</span></a>
     </div>
-    <div class="extra-band">
-      <div><p class="eyebrow">Beyond the classroom</p><h2>Yoga, dance, art, pottery & more</h2>
-        <p>Find instructors for weekly extracurricular classes — or book someone for a one-time event: annual day choreography, a pottery workshop, a magic show for Children's Day.</p>
-        <div class="row"><a class="btn btn-primary" href="#/teachers?type=extracurricular">Browse extracurricular teachers</a><a class="btn btn-ghost" href="#/teachers?type=event">One-time events</a></div></div>
-      <div class="act-tiles">${[['🧘', 'Yoga'], ['💃', 'Dance'], ['🎨', 'Art & craft'], ['🏺', 'Pottery'], ['🎵', 'Music & singing'], ['🥋', 'Karate / martial arts'], ['♟️', 'Chess'], ['🎩', 'Magic show']].map(([i, a]) => html`<a class="act-tile" href="#/teachers?type=${a === 'Magic show' ? 'event' : 'extracurricular'}&activity=${encodeURIComponent(a)}"><span>${i}</span>${a}</a>`)}</div>
+
+    <div class="steps-row" aria-label="How it works">
+      <div class="step"><span>📝</span><b>Sign up</b><small>2 minutes</small></div>
+      <i aria-hidden="true"></i>
+      <div class="step"><span>✅</span><b>Get verified</b><small>Proof & Aadhaar</small></div>
+      <i aria-hidden="true"></i>
+      <div class="step"><span>🤝</span><b>Connect</b><small>Invite, apply, book</small></div>
     </div>
+
+    <div class="section-head"><h2>Popular activities</h2><a href="#/teachers?type=extracurricular">All activities →</a></div>
+    <div class="act-row">${ACTS.map(([i, a]) => html`<a class="act-chip" href="#/teachers?type=${a === 'Magic show' ? 'event' : 'extracurricular'}&activity=${encodeURIComponent(a)}"><span>${i}</span>${a.replace(' / martial arts', '').replace(' & singing', '')}</a>`)}</div>
+
     ${jobs.length ? html`<div class="section-head"><h2>Latest openings</h2><a href="#/jobs">See all jobs →</a></div><div class="cards">${jobs.map((j) => jobCard(j))}</div>` : ''}
   </section>`);
+
+  // in-page jumps from the hero pills without touching the router
+  el.querySelectorAll('.aud-pills a').forEach((a) => a.addEventListener('click', (e) => {
+    e.preventDefault(); const t = el.querySelector(a.getAttribute('href'));
+    t?.scrollIntoView({ behavior: 'smooth', block: 'center' }); t?.classList.add('flash'); setTimeout(() => t?.classList.remove('flash'), 1200);
+  }));
 }

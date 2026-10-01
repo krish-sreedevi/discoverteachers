@@ -132,6 +132,9 @@ async function boot() {
   });
   document.addEventListener('click', async (e) => {
     if (e.target.closest('[data-logout]')) { await api.signOut(); state.user = null; state.profile = null; toast('Logged out'); go('/'); renderNav(); }
+    // Clicking the menu item for the page you're already on reloads it (with the loader) instead of doing nothing
+    const same = e.target.closest('#nav-links a[href^="#"], .site-footer a[href^="#"]');
+    if (same && same.getAttribute('href') === location.hash) { e.preventDefault(); route(); }
     if (e.target.closest('#nav-toggle')) document.body.classList.toggle('nav-open');
     else if (e.target.closest('#nav-links a, #nav-links button')) document.body.classList.remove('nav-open');
   });

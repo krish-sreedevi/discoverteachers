@@ -9,7 +9,7 @@ Live at **https://www.aksreedevi.in/discoverteachers/**
 - **Schools:** register with proof of establishment and map location, get verified, post jobs (autofilled from the school profile), and filter candidates by distance, experience, pay, languages, skills and teaching video.
 - **Job types:** full-time or part-time class teacher, regular **extracurricular** classes (paid per session), and **one-time events/workshops** (with an event date and total fee).
 - **Browse teachers:** everyone can browse class teachers, extracurricular instructors (yoga, dance, art, pottery, music, karate, chess…) and event performers. Visitors see a privacy-safe preview (first name + initial, location rounded to ~1 km, no contact details); verified schools see full profiles, contact details and videos.
-- **Teachers:** one profile covering what work they want (class / extracurricular / events), activities, fees, experience, languages, Aadhaar (checked, never shown to schools) and an optional teaching video.
+- **Teachers:** one profile covering what work they want (class / extracurricular / events), how far from home they will travel, activities, fees, experience, languages, Aadhaar (checked, never shown to schools) and an optional teaching video.
 - **Admin:** verifies schools and teachers.
 
 ## How it's built

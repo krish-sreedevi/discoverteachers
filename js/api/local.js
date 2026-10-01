@@ -1,7 +1,7 @@
 // Demo backend: same API as supabase.js, stored in this browser (localStorage + IndexedDB for files).
 import { seedData } from './seed.js';
 
-const KEY = 'dt_demo_db_v2', SKEY = 'dt_demo_session';
+const KEY = 'dt_demo_db_v3', SKEY = 'dt_demo_session';
 const clone = (x) => JSON.parse(JSON.stringify(x));
 const uuid = () => (crypto.randomUUID ? crypto.randomUUID() : 'id-' + Math.random().toString(36).slice(2) + Date.now().toString(36));
 const now = () => new Date().toISOString();

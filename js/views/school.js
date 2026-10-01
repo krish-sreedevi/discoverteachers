@@ -168,6 +168,7 @@ export async function jobForm(el, { id }, q = {}) {
 // =====================================================================
 // Candidates for a listing: filters + map + applicants
 // =====================================================================
+const willTravel = (t, d) => d == null || !t.travel_km || t.travel_km >= 50 || d <= t.travel_km;
 const speaks = (t, req) => (t.languages || []).some((l) => l.language?.toLowerCase() === req.language?.toLowerCase() && (PROF_RANK[l.proficiency] || 0) >= (PROF_RANK[req.proficiency] || 0));
 
 export async function jobManage(el, { id }, q) {
@@ -188,7 +189,7 @@ export async function jobManage(el, { id }, q) {
   const all = [...pool.values()].filter((t) => apps.some((a) => a.teacher_id === t.id) || (t.work_types && t.work_types.length ? t.work_types : ['class']).includes(wtype))
     .map((t) => ({ ...t, _dist: distanceKm(job, t), _price: priceOf(t) }));
 
-  const f = { dist: Number(q.dist || 15), exp: job.min_experience || 0, maxSal: job.salary_max || '', skills: extra && job.activity ? [job.activity] : [], langs: [], video: false, sort: 'distance', tab: q.tab || 'find' };
+  const f = { dist: Number(q.dist || 15), exp: job.min_experience || 0, maxSal: job.salary_max || '', skills: extra && job.activity ? [job.activity] : [], langs: [], video: false, radius: true, sort: 'distance', tab: q.tab || 'find' };
   const langReqs = job.languages || [];
 
   el.innerHTML = esc(html`<section class="page wide">
@@ -214,6 +215,7 @@ export async function jobManage(el, { id }, q) {
           ${langReqs.length ? html`<fieldset><legend>Must speak</legend>${langReqs.map((l, i) => html`<label class="check"><input type="checkbox" name="langs" value="${i}"> ${l.language} <small class="muted">(${l.proficiency}+)</small></label>`)}</fieldset>` : ''}
           <fieldset><legend>${extra ? 'Activity' : 'Skills'}</legend><div class="chip-picks small">${[...new Set([...(job.activity ? [job.activity] : []), ...(job.skills_preferred || []), ...(extra ? ACTIVITIES : SKILLS)])].map((s) => html`<label class="chip-pick"><input type="checkbox" name="skills" value="${s}" ${f.skills.includes(s) ? 'checked' : ''}><span>${s}</span></label>`)}</div></fieldset>
           <label class="check"><input type="checkbox" name="video"> Has a teaching video</label>
+          <label class="check"><input type="checkbox" name="radius" checked> Only teachers willing to travel this far</label>
           <label>Sort by<select name="sort">${options([['distance', 'Nearest first'], ['experience', 'Most experienced'], ['salary', 'Lowest expected salary'], ['match', 'Best match']], f.sort)}</select></label>
           <button type="button" class="btn btn-ghost btn-sm btn-block" data-clear>Reset filters</button>
         </aside>
@@ -264,7 +266,7 @@ export async function jobManage(el, { id }, q) {
   const read = () => {
     const d = formData(wrapForm(filtersEl));
     const checked = (n) => $$(`input[name=${n}]:checked`, filtersEl).map((c) => c.value);
-    f.dist = Number(d.dist); f.exp = Number(d.exp); f.maxSal = d.maxSal; f.sort = d.sort; f.video = !!d.video;
+    f.dist = Number(d.dist); f.exp = Number(d.exp); f.maxSal = d.maxSal; f.sort = d.sort; f.video = !!d.video; f.radius = !!d.radius;
     f.skills = checked('skills'); f.langs = checked('langs').map((i) => langReqs[Number(i)]);
     $('[data-distlabel]', el).textContent = f.dist > 50 ? 'Any' : `${f.dist} km`;
   };
@@ -277,6 +279,7 @@ export async function jobManage(el, { id }, q) {
     s += (job.skills_preferred || []).filter((x) => (t.skills || []).includes(x)).length * 6;
     s += langReqs.filter((l) => speaks(t, l)).length * 5;
     if (t.video_path || t.video_link) s += 6;
+    if (willTravel(t, t._dist)) s += 10;
     return s;
   };
   const filtered = () => all.filter((t) => {
@@ -286,6 +289,7 @@ export async function jobManage(el, { id }, q) {
     if (f.skills.length && !(extra ? f.skills.some((s) => tagsOf(t).includes(s)) : f.skills.every((s) => tagsOf(t).includes(s)))) return false;
     if (f.langs.length && !f.langs.every((l) => speaks(t, l))) return false;
     if (f.video && !(t.video_path || t.video_link)) return false;
+    if (f.radius && !willTravel(t, t._dist)) return false;
     return true;
   }).sort((a, b) => ({
     distance: () => (a._dist ?? 1e9) - (b._dist ?? 1e9),
@@ -307,6 +311,7 @@ export async function jobManage(el, { id }, q) {
         <span>🎓 ${yrs(t.experience_years)}</span>
         <span class="${within === true ? 'good' : within === false ? 'warn' : ''}">💰 ${t._price ? `${rupees(t._price)}${unit}` : 'Price on request'}${within === false ? ' (above budget)' : ''}</span>
         ${t.video_path || t.video_link ? html`<span class="good">🎬 Video</span>` : ''}
+        ${t.travel_km ? (willTravel(t, t._dist) ? html`<span class="within-badge">🚗 Will travel (up to ${t.travel_km >= 50 ? '50+' : t.travel_km} km)</span>` : html`<span class="beyond-badge">🚗 Usually travels ≤ ${t.travel_km} km</span>`) : ''}
       </div>
       <div class="chips">${(extra ? tagsOf(t) : t.skills || []).slice(0, 6).map((s) => html`<span class="chip ${pref.has(s) ? 'chip-match' : 'chip-skill'}">${s}</span>`)}</div>
       <div class="chips">${(t.languages || []).map((l) => html`<span class="chip ${langReqs.some((r) => r.language?.toLowerCase() === l.language?.toLowerCase()) ? 'chip-match' : ''}">${l.language} <small>· ${l.proficiency}</small></span>`)}</div>
@@ -342,7 +347,7 @@ export async function jobManage(el, { id }, q) {
   };
   filtersEl.addEventListener('input', () => { read(); renderList(); });
   $('[data-clear]', el).onclick = () => {
-    filtersEl.querySelectorAll('input[type=checkbox]').forEach((c) => { c.checked = false; });
+    filtersEl.querySelectorAll('input[type=checkbox]').forEach((c) => { c.checked = c.name === 'radius'; });
     filtersEl.querySelector('[name=dist]').value = 51; filtersEl.querySelector('[name=exp]').value = 0; filtersEl.querySelector('[name=maxSal]').value = '';
     read(); renderList();
   };
