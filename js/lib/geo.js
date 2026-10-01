@@ -1,5 +1,5 @@
 // Location helpers: distance, Google Maps link parsing, and a Leaflet pin-drop picker.
-import { html, toast } from './dom.js?v=20261001-4';
+import { html, toast } from './dom.js?v=20261001-5';
 
 export function distanceKm(a, b) {
   if (!a || !b || a.lat == null || b.lat == null || a.lng == null || b.lng == null) return null;

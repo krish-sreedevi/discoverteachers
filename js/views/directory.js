@@ -1,10 +1,10 @@
 // Browse teachers: class teachers, extracurricular instructors and one-time event performers.
-import { api } from '../api/index.js?v=20261001-4';
-import { fresh, withLoader, loaderHTML, html, esc, $, $$, toast, rupees, yrs, km, initials, modal, on } from '../lib/dom.js?v=20261001-4';
-import { ACTIVITIES, SKILLS, LANGUAGES, WORK_LABEL } from '../lib/constants.js?v=20261001-4';
-import { distanceKm, geocode } from '../lib/geo.js?v=20261001-4';
-import { options } from './widgets.js?v=20261001-4';
-import { state } from '../app.js?v=20261001-4';
+import { api } from '../api/index.js?v=20261001-5';
+import { fresh, withLoader, loaderHTML, html, esc, $, $$, toast, rupees, yrs, km, initials, modal, on } from '../lib/dom.js?v=20261001-5';
+import { ACTIVITIES, SKILLS, LANGUAGES, WORK_LABEL } from '../lib/constants.js?v=20261001-5';
+import { distanceKm, geocode } from '../lib/geo.js?v=20261001-5';
+import { options } from './widgets.js?v=20261001-5';
+import { state } from '../app.js?v=20261001-5';
 
 const MODES = [
   ['all', 'All teachers', ''],
@@ -42,13 +42,13 @@ export async function browseTeachers(el, _p, q) {
         <label>Near<div class="near"><input type="search" data-near placeholder="Area or pincode" value="${f.origin && u?.role !== 'school' && u?.role !== 'teacher' ? f.origin.label : ''}"><button type="button" class="btn btn-ghost btn-sm" data-me title="Use my location">📍</button></div>
           <small class="hint" data-origin>${f.origin ? `Distances from ${f.origin.label}` : 'Set a location to sort by distance'}</small></label>
         <label data-distwrap ${f.origin ? '' : 'hidden'}>Within: <strong data-distlabel></strong><input type="range" name="dist" min="1" max="51" value="${f.dist}"></label>
-        <fieldset><legend data-pickslabel></legend><div class="chip-picks small" data-picks></div></fieldset>
         <label>Minimum experience<select name="exp">${options([[0, 'Any'], [1, '1+ yr'], [2, '2+ yrs'], [3, '3+ yrs'], [5, '5+ yrs'], [8, '8+ yrs']], 0)}</select></label>
         <label data-budgetlabel>Budget up to (₹)<input type="number" name="budget" min="0" step="100" placeholder="Any"></label>
         <label>Speaks<select name="lang">${options(LANGUAGES, '', { placeholder: 'Any language' })}</select></label>
         <label class="check"><input type="checkbox" name="video"> Has a teaching video</label>
         <label class="check" data-radiuswrap ${f.origin ? '' : 'hidden'}><input type="checkbox" name="radius" checked> Only teachers willing to travel this far</label>
         <label>Sort by<select name="sort">${options([['near', 'Nearest first'], ['exp', 'Most experienced'], ['price', 'Lowest price']], f.sort)}</select></label>
+        <fieldset><legend data-pickslabel></legend><div class="chip-picks small" data-picks></div></fieldset>
       </aside>
       <div class="results"><div class="results-head"><p data-count></p></div><div class="cards" data-list></div></div>
     </div></section>`);

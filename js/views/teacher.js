@@ -1,9 +1,9 @@
-import { api } from '../api/index.js?v=20261001-4';
-import { fresh, withLoader, showLoader, html, esc, $, toast, salaryRange, payRange, ago, statusBadge, on } from '../lib/dom.js?v=20261001-4';
-import { distanceKm } from '../lib/geo.js?v=20261001-4';
-import { jobCard } from './jobs.js?v=20261001-4';
-import { jobWorkType } from '../lib/constants.js?v=20261001-4';
-import { state } from '../app.js?v=20261001-4';
+import { api } from '../api/index.js?v=20261001-5';
+import { fresh, withLoader, showLoader, html, esc, $, toast, salaryRange, payRange, ago, statusBadge, on } from '../lib/dom.js?v=20261001-5';
+import { distanceKm } from '../lib/geo.js?v=20261001-5';
+import { jobCard } from './jobs.js?v=20261001-5';
+import { jobWorkType } from '../lib/constants.js?v=20261001-5';
+import { state } from '../app.js?v=20261001-5';
 
 export async function dashboard(el) {
   el = fresh(el);

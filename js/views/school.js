@@ -1,9 +1,9 @@
-import { api } from '../api/index.js?v=20261001-4';
-import { fresh, withLoader, html, esc, $, $$, toast, setBusy, formData, num, rupees, salaryRange, payRange, yrs, km, ago, initials, statusBadge, langList, yesNo, confirmBox, on } from '../lib/dom.js?v=20261001-4';
-import { SKILLS, APP_STATUSES, PROF_RANK, CURRICULA, ACTIVITIES, JOB_TYPES, JOB_TYPE_LABEL, jobWorkType } from '../lib/constants.js?v=20261001-4';
-import { locationField, mountLocationField, readLocation, distanceKm, baseMap, pinIcon } from '../lib/geo.js?v=20261001-4';
-import { languagesField, skillsField, yesNoField, mountRepeaters, readRepeater, options } from './widgets.js?v=20261001-4';
-import { state, go } from '../app.js?v=20261001-4';
+import { api } from '../api/index.js?v=20261001-5';
+import { fresh, withLoader, html, esc, $, $$, toast, setBusy, formData, num, rupees, salaryRange, payRange, yrs, km, ago, initials, statusBadge, langList, yesNo, confirmBox, on } from '../lib/dom.js?v=20261001-5';
+import { SKILLS, APP_STATUSES, PROF_RANK, CURRICULA, ACTIVITIES, JOB_TYPES, JOB_TYPE_LABEL, jobWorkType } from '../lib/constants.js?v=20261001-5';
+import { locationField, mountLocationField, readLocation, distanceKm, baseMap, pinIcon } from '../lib/geo.js?v=20261001-5';
+import { languagesField, skillsField, yesNoField, mountRepeaters, readRepeater, options } from './widgets.js?v=20261001-5';
+import { state, go } from '../app.js?v=20261001-5';
 
 function verifyBanner() {
   const s = state.profile;
