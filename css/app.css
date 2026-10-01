@@ -298,31 +298,35 @@ html.intro-on, html.intro-on body { overflow: hidden; }
 @media (max-width: 760px) { .extra-band { grid-template-columns: 1fr; padding: 20px; } .act-tiles { grid-template-columns: repeat(4, 1fr); } }
 @media (max-width: 420px) { .act-tiles { grid-template-columns: repeat(2, 1fr); } }
 
-/* ---------- branded loader ---------- */
-.dt-loader { min-height: 52vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: 48px 16px; text-align: center; }
+/* ---------- branded loader (Discover Teachers Loader artwork) ---------- */
+.dt-loader { min-height: 52vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 48px 16px; text-align: center; }
 .dt-loader-compact { min-height: 0; padding: 32px 16px; }
-.dtl-mark { width: 92px; height: 92px; overflow: visible; }
-.dt-loader-compact .dtl-mark { width: 64px; height: 64px; }
-.dtl-msg { margin: 0; font: 700 1rem var(--font); color: var(--navy); letter-spacing: .01em; }
-.dtl-msg::after { content: ''; display: inline-block; width: 1.2em; text-align: left; animation: dtl-dots 1.4s steps(4) infinite; }
-.dtl-ring { fill: none; stroke: #1F2A6B; stroke-width: 10; stroke-linecap: round; stroke-dasharray: 233; stroke-dashoffset: 233; animation: dtl-ring 2.2s cubic-bezier(.6,0,.3,1) infinite; }
-.dtl-handle { stroke: #1F2A6B; stroke-width: 15; stroke-linecap: round; stroke-dasharray: 34; stroke-dashoffset: 34; animation: dtl-handle 2.2s ease-out infinite; }
-.dtl-head { fill: #F4A623; transform-box: fill-box; transform-origin: center; transform: scale(0); animation: dtl-pop 2.2s cubic-bezier(.3,1.6,.5,1) infinite; }
-.dtl-pg { fill: #F4A623; transform-box: fill-box; transform: scaleX(0); animation: dtl-unfold 2.2s cubic-bezier(.2,.9,.3,1.2) infinite; }
-.dtl-pl { transform-origin: right center; } .dtl-pr { transform-origin: left center; }
-.dtl-lens { transform-box: fill-box; transform-origin: 40% 40%; animation: dtl-nudge 2.2s ease-in-out infinite; }
-@keyframes dtl-ring { 0% { stroke-dashoffset: 233; opacity: 1; } 35% { stroke-dashoffset: 0; } 88% { stroke-dashoffset: 0; opacity: 1; } 100% { stroke-dashoffset: 0; opacity: 0; } }
-@keyframes dtl-handle { 0%, 30% { stroke-dashoffset: 34; opacity: 1; } 45% { stroke-dashoffset: 0; } 88% { opacity: 1; } 100% { stroke-dashoffset: 0; opacity: 0; } }
-@keyframes dtl-pop { 0%, 42% { transform: scale(0); opacity: 1; } 56% { transform: scale(1); } 88% { transform: scale(1); opacity: 1; } 100% { transform: scale(1); opacity: 0; } }
-@keyframes dtl-unfold { 0%, 50% { transform: scaleX(0); opacity: 1; } 64% { transform: scaleX(1); } 88% { transform: scaleX(1); opacity: 1; } 100% { transform: scaleX(1); opacity: 0; } }
-@keyframes dtl-nudge { 0%, 66% { transform: rotate(0); } 74% { transform: rotate(-9deg); } 82%, 100% { transform: rotate(0); } }
+.dtl-mark { width: 96px; height: 96px; overflow: visible; --dtl-ink: #1F2A6B; --dtl-acc: #F4A623; }
+.dt-loader-compact .dtl-mark { width: 56px; height: 56px; }
+.dtl-msg { margin: 0; font: 600 .95rem var(--font-head); color: var(--navy); }
+.dtl-msg::after { content: ''; display: inline-block; width: 1.2em; text-align: left; animation: dtl-dots 1.6s steps(4) infinite; }
+.dtl-ring { fill: none; stroke: var(--dtl-ink); stroke-width: 10; }
+.dtl-handle { stroke: var(--dtl-ink); stroke-width: 15; stroke-linecap: round; }
+.dtl-head, .dtl-pg { fill: var(--dtl-acc); }
+.dtl-orbit, .dtl-up { transform-origin: 60px 60px; animation: dtl-spin 1.6s linear infinite; }
+.dtl-up { animation-direction: reverse; }
+.dtl-pg { transform-box: fill-box; animation: dtl-flapL 1.6s ease-in-out infinite; }
+.dtl-pl { transform-origin: right center; } .dtl-pr { transform-origin: left center; animation-name: dtl-flapR; }
+.dtl-head { transform-box: fill-box; transform-origin: center; animation: dtl-bob .8s ease-in-out infinite alternate; }
+@keyframes dtl-spin { to { transform: rotate(360deg); } }
+@keyframes dtl-flapL { 0%, 50%, 100% { transform: scaleX(1); } 25% { transform: scaleX(.5); } }
+@keyframes dtl-flapR { 0%, 50%, 100% { transform: scaleX(1); } 75% { transform: scaleX(.5); } }
+@keyframes dtl-bob { to { transform: translateY(-2.5px); } }
 @keyframes dtl-dots { 0% { content: ''; } 25% { content: '.'; } 50% { content: '..'; } 75% { content: '...'; } }
+/* In buttons: ring follows the button text colour; reader is white on amber, amber on light buttons */
+.dtl-btn { width: 22px; height: 22px; margin: -4px 2px -4px -4px; --dtl-ink: currentColor; }
+.btn-primary .dtl-btn { --dtl-acc: #FFFFFF; }
+/* On dark backgrounds */
+.on-dark .dtl-mark { --dtl-ink: #FFFFFF; } .on-dark .dtl-msg { color: #fff; }
 @media (prefers-reduced-motion: reduce) {
-  .dtl-ring, .dtl-handle, .dtl-head, .dtl-pg, .dtl-lens { animation: none; stroke-dashoffset: 0; transform: none; }
-  .dt-loader .dtl-mark { animation: dtl-breathe 1.6s ease-in-out infinite; }
+  .dtl-orbit, .dtl-up, .dtl-pg { animation-duration: 4s; } .dtl-head { animation: none; }
   .dtl-msg::after { animation: none; content: '…'; }
 }
-@keyframes dtl-breathe { 50% { opacity: .45; } }
 
 /* ---------- home v2: audiences first, fewer words ---------- */
 .hero-v2 .hero-inner { padding-bottom: 88px; }

@@ -120,7 +120,7 @@ export const num = (v) => (v === '' || v == null ? null : Number(v));
 
 export function setBusy(btn, busy, label) {
   if (!btn) return;
-  if (busy) { btn.dataset.label = btn.innerHTML; btn.disabled = true; btn.innerHTML = `<span class="spin"></span>${label || 'Please wait…'}`; }
+  if (busy) { btn.dataset.label = btn.innerHTML; btn.disabled = true; btn.innerHTML = `${loaderMark('dtl-btn')}${label || 'Please wait…'}`; }
   else { btn.disabled = false; if (btn.dataset.label) btn.innerHTML = btn.dataset.label; }
 }
 
@@ -131,14 +131,20 @@ export function payRange(min, max, unit = 'month') {
 }
 
 // ---------- branded loader (the logo's magnifier draws itself, on a loop) ----------
-const LOADER_SVG = '<svg class="dtl-mark" viewBox="22 12 112 112" aria-hidden="true"><g transform="translate(16,8)"><g class="dtl-lens">'
-  + '<circle class="dtl-ring" cx="52" cy="52" r="37" transform="rotate(-135 52 52)"/>'
+// New branded loader (from the "Discover Teachers Loader" artwork): the glass circles in a search
+// motion while the book pages turn and the reader bobs. One loop = 1.6s. Colours come from CSS.
+const LOADER_SVG = '<svg class="dtl-mark" viewBox="0 0 120 120" aria-hidden="true">'
+  + '<g class="dtl-orbit"><g transform="translate(0,-6)"><g class="dtl-up">'
+  + '<g transform="translate(60,60) scale(.82) translate(-60.7,-60.7)">'
+  + '<circle class="dtl-ring" cx="52" cy="52" r="37"/>'
   + '<line class="dtl-handle" x1="80" y1="80" x2="104" y2="104"/>'
   + '<circle class="dtl-head" cx="52" cy="36" r="8"/>'
   + '<path class="dtl-pg dtl-pl" d="M49 52 C43 47 35 46 28 48 L28 70 C35 68 43 69 49 74 Z"/>'
-  + '<path class="dtl-pg dtl-pr" d="M55 52 C61 47 69 46 76 48 L76 70 C69 68 61 69 55 74 Z"/></g></g></svg>';
+  + '<path class="dtl-pg dtl-pr" d="M55 52 C61 47 69 46 76 48 L76 70 C69 68 61 69 55 74 Z"/>'
+  + '</g></g></g></g></svg>';
+export const loaderMark = (cls = '') => LOADER_SVG.replace('class="dtl-mark"', `class="dtl-mark ${cls}"`);
 
-export function loaderHTML(message = 'Loading…', { compact = false } = {}) {
+export function loaderHTML(message = 'Loading', { compact = false } = {}) {
   return `<div class="dt-loader${compact ? ' dt-loader-compact' : ''}" role="status" aria-live="polite">${LOADER_SVG}<p class="dtl-msg">${esc(message)}</p></div>`;
 }
 export function showLoader(el, message, opts) { if (el) el.innerHTML = loaderHTML(message, opts); }

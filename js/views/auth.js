@@ -1,7 +1,7 @@
-import { api } from '../api/index.js?v=20261001-7';
-import { html, esc, $, toast, setBusy } from '../lib/dom.js?v=20261001-7';
-import { isEmail } from '../lib/validate.js?v=20261001-7';
-import { state, refreshProfile, go, homeFor } from '../app.js?v=20261001-7';
+import { api } from '../api/index.js?v=20261001-8';
+import { html, esc, $, toast, setBusy } from '../lib/dom.js?v=20261001-8';
+import { isEmail } from '../lib/validate.js?v=20261001-8';
+import { state, refreshProfile, go, homeFor } from '../app.js?v=20261001-8';
 
 const roleCopy = {
   school: { icon: '🏫', title: 'School', blurb: 'Post openings and find verified teachers near you' },
