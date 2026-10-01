@@ -1,11 +1,11 @@
-import { api } from '../api/index.js?v=20261001-9';
-import { fresh, withLoader, showLoader, loaderHTML, html, esc, $, $$, toast, setBusy, salaryRange, payRange, km, ago, statusBadge, langList, yesNo, modal } from '../lib/dom.js?v=20261001-9';
-import { distanceKm, baseMap, pinIcon, gmapsDirections, gmapsUrl } from '../lib/geo.js?v=20261001-9';
-import { options } from './widgets.js?v=20261001-9';
-import { JOB_TYPE_LABEL, jobWorkType } from '../lib/constants.js?v=20261001-9';
+import { api } from '../api/index.js?v=20261001-10';
+import { fresh, withLoader, showLoader, loaderHTML, html, esc, $, $$, toast, setBusy, salaryRange, payRange, km, ago, statusBadge, langList, yesNo, modal } from '../lib/dom.js?v=20261001-10';
+import { distanceKm, baseMap, pinIcon, gmapsDirections, gmapsUrl } from '../lib/geo.js?v=20261001-10';
+import { options } from './widgets.js?v=20261001-10';
+import { JOB_TYPE_LABEL, jobWorkType } from '../lib/constants.js?v=20261001-10';
 
 const fmtDate = (d) => new Date(d + 'T00:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
-import { state } from '../app.js?v=20261001-9';
+import { state } from '../app.js?v=20261001-10';
 
 export function jobCard(j, { dist, app } = {}) {
   return html`<a class="jcard" href="#/jobs/${j.id}">

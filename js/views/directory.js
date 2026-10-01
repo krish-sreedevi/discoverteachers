@@ -1,10 +1,10 @@
 // Browse teachers: class teachers, extracurricular instructors and one-time event performers.
-import { api } from '../api/index.js?v=20261001-9';
-import { fresh, withLoader, loaderHTML, html, esc, $, $$, toast, rupees, yrs, km, initials, modal, on } from '../lib/dom.js?v=20261001-9';
-import { ACTIVITIES, SKILLS, LANGUAGES, WORK_LABEL } from '../lib/constants.js?v=20261001-9';
-import { distanceKm, geocode } from '../lib/geo.js?v=20261001-9';
-import { options } from './widgets.js?v=20261001-9';
-import { state } from '../app.js?v=20261001-9';
+import { api } from '../api/index.js?v=20261001-10';
+import { fresh, withLoader, loaderHTML, html, esc, $, $$, toast, rupees, yrs, km, initials, modal, on } from '../lib/dom.js?v=20261001-10';
+import { ACTIVITIES, SKILLS, LANGUAGES, WORK_LABEL } from '../lib/constants.js?v=20261001-10';
+import { distanceKm, geocode } from '../lib/geo.js?v=20261001-10';
+import { options } from './widgets.js?v=20261001-10';
+import { state } from '../app.js?v=20261001-10';
 
 const MODES = [
   ['class', 'Class teachers', '🏫'],

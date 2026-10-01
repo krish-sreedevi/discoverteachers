@@ -1,8 +1,8 @@
-import { api } from '../api/index.js?v=20261001-9';
-import { html, esc } from '../lib/dom.js?v=20261001-9';
-import { ACTIVITIES } from '../lib/constants.js?v=20261001-9';
-import { jobCard } from './jobs.js?v=20261001-9';
-import { state, homeFor } from '../app.js?v=20261001-9';
+import { api } from '../api/index.js?v=20261001-10';
+import { html, esc } from '../lib/dom.js?v=20261001-10';
+import { ACTIVITIES } from '../lib/constants.js?v=20261001-10';
+import { jobCard } from './jobs.js?v=20261001-10';
+import { state, homeFor } from '../app.js?v=20261001-10';
 
 const ACTS = [['🧘', 'Yoga'], ['💃', 'Dance'], ['🎨', 'Art & craft'], ['🏺', 'Pottery'], ['🎵', 'Music & singing'], ['🥋', 'Karate / martial arts'], ['♟️', 'Chess'], ['🎩', 'Magic show']];
 
