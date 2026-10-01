@@ -1,14 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="Discover Teachers"><g transform="translate(0 0) scale(1)">
-  <path d="M84 84 L106 106" stroke="#23305B" stroke-width="15" stroke-linecap="round"/>
-  <circle cx="52" cy="52" r="38" fill="#FFF7E8" stroke="#14A3A1" stroke-width="10"/>
-  <g transform="translate(52 57) scale(0.88) translate(-52 -57)">
-    <path d="M52 40 C44 33 29 37 29 54 C29 69 39 80 47 80 C50 80 51 78.5 52 78.5 C53 78.5 54 80 57 80 C65 80 75 69 75 54 C75 37 60 33 52 40 Z" fill="#FF6B57"/>
-    <path d="M52 41 C52 36 53 32 56 28" stroke="#23305B" stroke-width="3.5" stroke-linecap="round" fill="none"/>
-    <path d="M56 33 C58 25 66 22 72 24 C70 31 63 35 56 33 Z" fill="#4CB944"/>
-    <circle cx="44.5" cy="55" r="3.2" fill="#23305B"/><circle cx="59.5" cy="55" r="3.2" fill="#23305B"/>
-    <path d="M44 63 Q52 70 60 63" stroke="#23305B" stroke-width="3.2" stroke-linecap="round" fill="none"/>
-    <circle cx="38.5" cy="62" r="3" fill="#FFB3A7"/><circle cx="65.5" cy="62" r="3" fill="#FFB3A7"/>
-  </g>
-  <path d="M100 6 L103 15 L112 18 L103 21 L100 30 L97 21 L88 18 L97 15 Z" fill="#FFC23C"/>
-  <path d="M18 92 L19.6 96.4 L24 98 L19.6 99.6 L18 104 L16.4 99.6 L12 98 L16.4 96.4 Z" fill="#FFC23C"/>
-</g></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="8 8 128 128" role="img" aria-label="Discover Teachers"><g transform="translate(16,8)"><circle cx="52" cy="52" r="37" fill="none" stroke="#1F2A6B" stroke-width="10"/><line x1="80" y1="80" x2="104" y2="104" stroke="#1F2A6B" stroke-width="15" stroke-linecap="round"/><circle cx="52" cy="36" r="8" fill="#F4A623"/><path fill="#F4A623" d="M49 52 C43 47 35 46 28 48 L28 70 C35 68 43 69 49 74 Z"/><path fill="#F4A623" d="M55 52 C61 47 69 46 76 48 L76 70 C69 68 61 69 55 74 Z"/></g></svg>

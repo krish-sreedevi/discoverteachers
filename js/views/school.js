@@ -294,7 +294,7 @@ export async function jobManage(el, { id }, q) {
   const drawMap = (list) => {
     layer.clearLayers();
     if (circle) { circle.remove(); circle = null; }
-    if (f.dist <= 50) circle = window.L.circle([job.lat, job.lng], { radius: f.dist * 1000, color: '#14A3A1', weight: 1, fillOpacity: 0.06 }).addTo(map);
+    if (f.dist <= 50) circle = window.L.circle([job.lat, job.lng], { radius: f.dist * 1000, color: '#2E3A85', weight: 1, fillOpacity: 0.06 }).addTo(map);
     list.forEach((t) => { if (t.lat != null) window.L.marker([t.lat, t.lng], { icon: pinIcon('teacher') }).bindPopup(`<a href="#/teachers/${t.id}?job=${id}">${esc(t.full_name)}</a><br>${esc(km(t._dist))} · ${esc(yrs(t.experience_years))}`).addTo(layer); });
     if (circle) map.fitBounds(circle.getBounds(), { padding: [10, 10] });
   };
