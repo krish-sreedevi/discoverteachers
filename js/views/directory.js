@@ -1,13 +1,12 @@
 // Browse teachers: class teachers, extracurricular instructors and one-time event performers.
-import { api } from '../api/index.js?v=20261001-5';
-import { fresh, withLoader, loaderHTML, html, esc, $, $$, toast, rupees, yrs, km, initials, modal, on } from '../lib/dom.js?v=20261001-5';
-import { ACTIVITIES, SKILLS, LANGUAGES, WORK_LABEL } from '../lib/constants.js?v=20261001-5';
-import { distanceKm, geocode } from '../lib/geo.js?v=20261001-5';
-import { options } from './widgets.js?v=20261001-5';
-import { state } from '../app.js?v=20261001-5';
+import { api } from '../api/index.js?v=20261001-6';
+import { fresh, withLoader, loaderHTML, html, esc, $, $$, toast, rupees, yrs, km, initials, modal, on } from '../lib/dom.js?v=20261001-6';
+import { ACTIVITIES, SKILLS, LANGUAGES, WORK_LABEL } from '../lib/constants.js?v=20261001-6';
+import { distanceKm, geocode } from '../lib/geo.js?v=20261001-6';
+import { options } from './widgets.js?v=20261001-6';
+import { state } from '../app.js?v=20261001-6';
 
 const MODES = [
-  ['all', 'All teachers', ''],
   ['class', 'Class teachers', '🏫'],
   ['extracurricular', 'Extracurricular', '🎨'],
   ['event', 'One-time events', '🎉'],
@@ -21,7 +20,7 @@ export async function browseTeachers(el, _p, q) {
   const full = u?.role === 'admin' || (u?.role === 'school' && state.profile?.status === 'approved');
   const rows = await withLoader(api.listTeacherDirectory(full), 1600);
   const f = {
-    mode: MODES.some((m) => m[0] === q.type) ? q.type : 'all',
+    mode: MODES.some((m) => m[0] === q.type) ? q.type : 'class',
     picks: q.activity ? [q.activity] : [],
     dist: 51, exp: 0, budget: '', lang: '', video: false, sort: 'near',
     origin: (u?.role === 'school' || u?.role === 'teacher') && state.profile?.lat != null ? { lat: state.profile.lat, lng: state.profile.lng, label: u.role === 'school' ? 'your school' : 'your home' } : null,
@@ -48,7 +47,7 @@ export async function browseTeachers(el, _p, q) {
         <label class="check"><input type="checkbox" name="video"> Has a teaching video</label>
         <label class="check" data-radiuswrap ${f.origin ? '' : 'hidden'}><input type="checkbox" name="radius" checked> Only teachers willing to travel this far</label>
         <label>Sort by<select name="sort">${options([['near', 'Nearest first'], ['exp', 'Most experienced'], ['price', 'Lowest price']], f.sort)}</select></label>
-        <fieldset><legend data-pickslabel></legend><div class="chip-picks small" data-picks></div></fieldset>
+        <fieldset data-pickswrap><legend data-pickslabel></legend><div class="chip-picks small" data-picks></div></fieldset>
       </aside>
       <div class="results"><div class="results-head"><p data-count></p></div><div class="cards" data-list></div></div>
     </div></section>`);
@@ -64,6 +63,8 @@ export async function browseTeachers(el, _p, q) {
   };
 
   const renderPicks = () => {
+    $('[data-pickswrap]', el).hidden = f.mode === 'class';
+    if (f.mode === 'class') f.picks = [];
     const list = f.mode === 'class' ? SKILLS : f.mode === 'all' ? [...new Set([...allActs, ...SKILLS])] : allActs;
     $('[data-pickslabel]', el).textContent = f.mode === 'class' ? 'Special skills' : 'Activity';
     $('[data-picks]', el).innerHTML = esc(html`${list.map((s) => html`<label class="chip-pick"><input type="checkbox" name="picks" value="${s}" ${f.picks.includes(s) ? 'checked' : ''}><span>${s}</span></label>`)}`);
@@ -125,7 +126,7 @@ export async function browseTeachers(el, _p, q) {
   on(el, 'click', '[data-mode]', (e, b) => {
     f.mode = b.dataset.mode; renderPicks();
     $('[data-count]', el).innerHTML = ''; $('[data-list]', el).innerHTML = loaderHTML({ class: 'Finding class teachers', extracurricular: 'Finding instructors', event: 'Finding event performers' }[f.mode] || 'Finding teachers', { compact: true });
-    clearTimeout(el._t); el._t = setTimeout(render, 700); history.replaceState(null, '', `#/teachers${f.mode !== 'all' ? '?type=' + f.mode : ''}`); });
+    clearTimeout(el._t); el._t = setTimeout(render, 700); history.replaceState(null, '', `#/teachers?type=${f.mode}`); });
   panel.addEventListener('input', (e) => { if (!e.target.matches('[data-near]')) render(); });
   $('[data-me]', el).onclick = () => {
     if (!navigator.geolocation) return toast('Location isn\'t available in this browser', 'error');
